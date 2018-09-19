@@ -6,7 +6,7 @@ const ErisEmbedBuilder = require('eris-embed-builder');
 const messageHandler = require('./handlers/messageHandler.js');
 const ageHandler = require('./handlers/ageHandler.js');
 
-var bot = new Eris("NDg0Nzg1MzMzODU1MDU5OTcz.DmnD2A.D-vR982641AgNDCK5-ZlHHjZVo0",{
+var bot = new Eris("snip",{
     restMode: true,
 });
 
