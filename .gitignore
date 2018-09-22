@@ -60,4 +60,8 @@ typings/
 # next.js build output
 .next
 
+#prevent the db from being uploaded to Github(since it is a stupid thing to do)
 /rethinkdb-2.3.6
+
+#file for bot token and prefix
+options.txt
