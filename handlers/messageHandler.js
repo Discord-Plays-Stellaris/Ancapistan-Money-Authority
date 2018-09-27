@@ -1,5 +1,5 @@
 const fs = require('fs');
-exports.initMessageHandler = function(bot) {
+exports.initMessageHandler = function(bot, prefix) {
     var filess = [];
     var commands = new Map();
     var embedMap = new Map();
@@ -24,7 +24,7 @@ exports.initMessageHandler = function(bot) {
     });
 
     bot.on("messageCreate", async (msg) => {
-        if(msg.content.charAt(0) == "&") {
+        if(msg.content.charAt(0) == prefix) {
              var args = msg.content.split(" ");
              args[0] = args[0].substring(1, args[0].length);
             if(commands.get(args[0]) != undefined) {
