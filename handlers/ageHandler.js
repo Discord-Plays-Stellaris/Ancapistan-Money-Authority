@@ -76,6 +76,8 @@ exports.kill = async function(user, guild) {
     var mem = await guild.getRESTMember(user.id);
     var roles = mem.roles;
     var roles = roles.filter(checkRole);
+    var channel = await user.getDMChannel();
+    channel.createMessage("Time's up, you have died.")
     guild.editMember(user.id, [{nick: mem.username, roles: roles}]);
     r.db('wealth').table('timers').get(user.id).delete().run();
     r.db('wealth').table('users').get(user.id).delete().run();
