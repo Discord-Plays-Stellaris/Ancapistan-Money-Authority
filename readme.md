@@ -1,4 +1,4 @@
-#An economy bot for a discord guild called Discord Play Stellaris 
+# An economy bot for a discord guild called Discord Play Stellaris 
   
 Some of the functions in it are currently disabled due to them being broken or useless, or both.  
 This code runs but might be unstable, who knows?  
