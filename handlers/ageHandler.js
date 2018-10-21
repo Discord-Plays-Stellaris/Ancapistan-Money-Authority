@@ -17,6 +17,18 @@ exports.getAge = async function(user) {
     }).error(null);
     return age;
 }
+exports.setAge = async function(user, age) {
+    await r.db('wealth').table('users').get(user.id).run().then(async function(result) {
+        json = JSON.stringify(result, null, 2);
+        obj = JSON.parse(json);
+        if(obj.age == null || obj.age == undefined) { //if it doesn't exist, make an entry for the user
+        await r.db('wealth').table('users').insert({id: user.id,
+            age: Math.floor(Math.random() * Math.floor(25 - 20 + 1) + 20),
+        expectancy: Math.floor(Math.random() * Math.floor(120 - 80 + 1) + 80)}, {conflict: "update"}).run();
+        }
+    }).error(null); //attempt to get the user wealth data
+    await r.db('wealth').table('users').get(user.id).update({age: age});
+}
 exports.setAgeAll = async function(guild, amount) {
     guild.members.forEach(async function (member) {
         await r.db('wealth').table('users').get(member.id).run().then( async function(result) {
@@ -38,9 +50,10 @@ exports.setAgeAll = async function(guild, amount) {
             obj = JSON.parse(json);
             age = obj.age;
             if(age >= obj.expectancy) {
-                member.user.getDMChannel().createMessage("Death is coming, you have 24 hours(or the next bot restart) to seal any loose ends before your character gives up the ghost.");
-                setTimeout(function() { kill(member.user, guild) }, 86400000)
-                await r.db('wealth').table('timers').insert([{id: user.id, member: member}]).run();
+                var chan = await member.user.getDMChannel();
+                chan.createMessage("Death is coming, you have 24 hours(or the next bot restart) to seal any loose ends before your character gives up the ghost.");
+                setTimeout(function() { kill(member.user.id, guild) }, 86400000)
+                await r.db('wealth').table('timers').insert([{id: member.user.id}]).run();
             }
             var newage = parseInt(age) + parseInt(amount);
             await r.db('wealth').table('users').get(member.id).update({age: newage}).run();

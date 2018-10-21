@@ -8,7 +8,7 @@ exports.command = async function(args, msg) {
     } else if (!(mem.roles.includes("499949303708516374") || msg.author.id == "213627387206828032")) {
         return "You do not have access to this command."
     } else {
-        ageHandler.kill(msg.mentions[0], msg.channel.guild);
+        ageHandler.kill(msg.mentions[0].id, msg.channel.guild);
         return "Killed  " + msg.mentions[0].username;
     }
     return "WIP";
