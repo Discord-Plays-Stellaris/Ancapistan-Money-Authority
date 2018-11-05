@@ -1,4 +1,5 @@
 var r = require('rethinkdbdash')();
+var ppHandler = require('./PPHandler.js');
 exports.getAge = async function(user) {
     await r.db('wealth').table('users').get(user.id).run().then(async function(result) {
         json = JSON.stringify(result, null, 2);
@@ -55,6 +56,9 @@ exports.setAgeAll = async function(guild, amount) {
                 setTimeout(function() { kill(member.user.id, guild) }, 86400000)
                 await r.db('wealth').table('timers').insert([{id: member.user.id}]).run();
             }
+            var PP = await ppHandler.getPP(member.user);
+            var newPP = Math.floor(PP-((PP/100)*age));
+            await ppHandler.setPP(member.user, newPP);
             var newage = parseInt(age) + parseInt(amount);
             await r.db('wealth').table('users').get(member.id).update({age: newage}).run();
             });
