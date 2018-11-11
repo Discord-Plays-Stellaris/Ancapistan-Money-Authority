@@ -56,13 +56,13 @@ exports.setAgeAll = async function(guild, amount) {
                 setTimeout(function() { kill(member.user.id, guild) }, 86400000)
                 await r.db('wealth').table('timers').insert([{id: member.user.id}]).run();
             }
-            var PP = await ppHandler.getPP(member.user);
-            var newPP = Math.floor(PP-((PP/100)*age));
-            await ppHandler.setPP(member.user, newPP);
             var newage = parseInt(age) + parseInt(amount);
             await r.db('wealth').table('users').get(member.id).update({age: newage}).run();
-            });
         });
+        var PP = await ppHandler.getPP(member.user);
+        var newPP = Math.floor(PP-((PP/100)*amount));
+        await ppHandler.setPP(member.user, newPP);
+    });
 }
 exports.fix = async function(guild) {
     guild.members.forEach(async function (member) {
@@ -84,7 +84,7 @@ exports.fix = async function(guild) {
             json = JSON.stringify(results, null, 2);
             obj = JSON.parse(json);
             age = obj.expectancy;
-            var newage = toInt(expectancy) + 10;
+            var newage = parseInt(expectancy) + 10;
             await r.db('wealth').table('users').get(member.id).update({expectancy: newage}).run();
             });
         });
