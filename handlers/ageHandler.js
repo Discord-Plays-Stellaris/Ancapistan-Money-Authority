@@ -7,7 +7,7 @@ exports.getAge = async function(user) {
         if(obj.age == null || obj.age == undefined) { //if it doesn't exist, make an entry for the user
         await r.db('wealth').table('users').insert({id: user.id,
             age: Math.floor(Math.random() * Math.floor(25 - 20 + 1) + 20),
-        expectancy: Math.floor(Math.random() * Math.floor(120 - 80 + 1) + 80)}, {conflict: "update"}).run();
+        expectancy: Math.floor(Math.random() * Math.floor(130 - 90 + 1) + 90)}, {conflict: "update"}).run();
         }
     }).error(null); //attempt to get the user wealth data
     var age;
@@ -25,7 +25,7 @@ exports.setAge = async function(user, age) {
         if(obj.age == null || obj.age == undefined) { //if it doesn't exist, make an entry for the user
         await r.db('wealth').table('users').insert({id: user.id,
             age: Math.floor(Math.random() * Math.floor(25 - 20 + 1) + 20),
-        expectancy: Math.floor(Math.random() * Math.floor(120 - 80 + 1) + 80)}, {conflict: "update"}).run();
+        expectancy: Math.floor(Math.random() * Math.floor(130 - 90 + 1) + 90)}, {conflict: "update"}).run();
         }
     }).error(null); //attempt to get the user wealth data
     await r.db('wealth').table('users').get(user.id).update({age: age});
@@ -38,11 +38,11 @@ exports.setAgeAll = async function(guild, amount) {
             if(obj == null) { //if it doesn't exist, make an entry for the user
                 await r.db('wealth').table('users').insert({id: member.id,
                     age: Math.floor(Math.random() * Math.floor(25 - 20 + 1) + 20),
-                expectancy: Math.floor(Math.random() * Math.floor(120 - 80 + 1) + 80)}, {conflict: "update"}).run();
+                expectancy: Math.floor(Math.random() * Math.floor(130 - 90 + 1) + 90)}, {conflict: "update"}).run();
             } else if (obj.age == null) {
                 await r.db('wealth').table('users').insert({id: member.id,
                     age: Math.floor(Math.random() * Math.floor(25 - 20 + 1) + 20),
-                expectancy: Math.floor(Math.random() * Math.floor(120 - 80 + 1) + 80)}, {conflict: "update"}).run();
+                expectancy: Math.floor(Math.random() * Math.floor(130 - 90 + 1) + 90)}, {conflict: "update"}).run();
             }
         }).error(null); //attempt to get the user wealth data
         var age;
@@ -72,20 +72,20 @@ exports.fix = async function(guild) {
             if(obj == null) { //if it doesn't exist, make an entry for the user
                 await r.db('wealth').table('users').insert({id: member.id,
                     age: Math.floor(Math.random() * Math.floor(25 - 20 + 1) + 20),
-                expectancy: Math.floor(Math.random() * Math.floor(120 - 80 + 1) + 80)}, {conflict: "update"}).run();
+                expectancy: Math.floor(Math.random() * Math.floor(130 - 90 + 1) + 90)}, {conflict: "update"}).run();
             } else if (obj.age == null) {
                 await r.db('wealth').table('users').insert({id: member.id,
                     age: Math.floor(Math.random() * Math.floor(25 - 20 + 1) + 20),
-                expectancy: Math.floor(Math.random() * Math.floor(120 - 80 + 1) + 80)}, {conflict: "update"}).run();
+                expectancy: Math.floor(Math.random() * Math.floor(130 - 90 + 1) + 90)}, {conflict: "update"}).run();
             }
         }).error(null); //attempt to get the user wealth data
         var age;
         await r.db('wealth').table('users').get(member.id).run().then(async function(results) {
             json = JSON.stringify(results, null, 2);
             obj = JSON.parse(json);
-            age = obj.age;
-            var newage = age.substring(0,2);
-            await r.db('wealth').table('users').get(member.id).update({age: newage}).run();
+            age = obj.expectancy;
+            var newage = toInt(expectancy) + 10;
+            await r.db('wealth').table('users').get(member.id).update({expectancy: newage}).run();
             });
         });
 }
