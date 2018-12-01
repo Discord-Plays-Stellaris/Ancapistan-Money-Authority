@@ -47,6 +47,7 @@ namespace VIR
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
                 .AddSingleton<HttpClient>()
+                .AddSingleton<DataBaseHandlingService>()
                 .BuildServiceProvider();
         }
     }
