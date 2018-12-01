@@ -1,6 +1,6 @@
 # An economy bot for a discord guild called Discord Plays Stellaris 
   
-#The Rewrite Branch
+## The Rewrite Branch
 Set-up is simple, clone this repo, open in a .NET IDE, make sure to add a Resource for the bot token(Look it up if you don't know how) and compile.
 
 ## TL;DR of the license.
