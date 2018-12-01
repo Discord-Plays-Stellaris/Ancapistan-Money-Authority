@@ -41,8 +41,8 @@ namespace VIR.Services
             if (message.Source != MessageSource.User) return;
 
             var argPos = 0;
-            if ((!message.HasMentionPrefix(__client.CurrentUser, ref argPos)) || !message.HasCharPrefix('&', ref argPos)) return;
-
+            if (!message.HasMentionPrefix(__client.CurrentUser, ref argPos) && !message.HasCharPrefix('&', ref argPos)) return;
+            
             var context = new SocketCommandContext(__client, message);
             await __commands.ExecuteAsync(context, argPos, __services);
         }

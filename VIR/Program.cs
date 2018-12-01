@@ -22,10 +22,9 @@ namespace VIR
             using (var services = ConfigureServices())
             {
                 var __client = services.GetRequiredService<DiscordSocketClient>(); //Create a new client in the Client Variable
-
+                
                 __client.Log += LogAsync;
-                __client.Ready += Ready;
-                await __client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token")); //Log in the bot
+                await __client.LoginAsync(TokenType.Bot, Properties.Resources.token); //Log in the bot
                 await __client.StartAsync(); //Start the bot
 
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
@@ -38,13 +37,6 @@ namespace VIR
         private Task LogAsync(LogMessage log)
         {
             Log.Logger(Log.Logs.INFO, log.ToString());
-            return Task.CompletedTask;
-        }
-
-        private Task Ready()
-        {
-            Log.Logger(Log.Logs.INFO, "VIR is ready!");
-
             return Task.CompletedTask;
         }
 
