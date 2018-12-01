@@ -4,10 +4,12 @@ using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VIR.Properties;
 
 namespace VIR.Services
 {
@@ -15,12 +17,29 @@ namespace VIR.Services
     {
         private readonly RethinkDB r = RethinkDB.R;
         private readonly Connection conn;
-
-        private Exception NonexistantFieldException;
+        
 
         public DataBaseHandlingService()
         {
-            conn = r.Connection().Hostname("127.0.0.1").Timeout(60).Connect();
+            try
+            {
+                conn = r.Connection().Hostname("127.0.0.1").Timeout(60).Connect();
+            } catch(Exception e)
+            {
+                Process rdb = new Process();
+                rdb.StartInfo.UseShellExecute = false;
+                rdb.StartInfo.FileName = Resources.RethinkDBExec + "rethinkdb.exe";
+                rdb.StartInfo.CreateNoWindow = true;
+                rdb.StartInfo.WorkingDirectory = Resources.RethinkDBExec;
+                bool work = rdb.Start();
+                if(work)
+                {
+                    conn = r.Connection().Hostname("127.0.0.1").Timeout(60).Connect();
+                } else
+                {
+                    throw new Exception();
+                }
+            }
         }
 
         public async Task setFieldAsync<T>(string userid, string fieldName, T value) {

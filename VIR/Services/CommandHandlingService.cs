@@ -17,14 +17,16 @@ namespace VIR.Services
         private readonly CommandService __commands;
         private readonly DiscordSocketClient __client;
         private readonly IServiceProvider __services;
+        private readonly DataBaseHandlingService __db;
 
         public CommandHandlingService(IServiceProvider services)
         {
             __commands = services.GetRequiredService<CommandService>();
             __client = services.GetRequiredService<DiscordSocketClient>();
+            __db = services.GetRequiredService<DataBaseHandlingService>();
             __services = services;
 
-            __commands.CommandExecuted += CommandExecutedAsync;
+            //__commands.CommandExecuted += CommandExecutedAsync;
             __commands.Log += Logging;
             __client.MessageReceived += MessageReceivedAsync;
 
@@ -40,21 +42,35 @@ namespace VIR.Services
             if (!(msg is SocketUserMessage message)) return;
             if (message.Source != MessageSource.User) return;
 
-            var argPos = 0;
+            int argPos = 0;
             if (!message.HasMentionPrefix(__client.CurrentUser, ref argPos) && !message.HasCharPrefix('&', ref argPos)) return;
             
-            var context = new SocketCommandContext(__client, message);
-            await __commands.ExecuteAsync(context, argPos, __services);
+            SocketCommandContext context = new SocketCommandContext(__client, message);
+            IResult res = await __commands.ExecuteAsync(context, argPos, __services);
+            await CommandExecutedAsync(context, res);
         }
 
-        public async Task CommandExecutedAsync(CommandInfo command, ICommandContext context, IResult result)
+        public async Task CommandExecutedAsync(ICommandContext context, IResult result)
         {
             /*if (!command.IsSpecified)
                 return;*/
 
+            //await Log.Logger(Log.Logs.INFO, result.IsSuccess.ToString());
+
+            if (result.Error.Value == CommandError.UnmetPrecondition)
+            {
+                await context.Channel.SendMessageAsync($"The following condition has failed: {result.ErrorReason}");
+                return;
+            }
+            if(result.Error.Value == CommandError.BadArgCount)
+            {
+                await context.Channel.SendMessageAsync($"Not enough arguments for the command!");
+                return;
+            }
+
             if (result.IsSuccess)
                 return;
-
+            await context.Channel.SendMessageAsync($"There was an error running the command, please try it again and if the problem persists contact towergame#9726. {result.ErrorReason}");
             await Log.Logger(Log.Logs.ERROR, $"A problem occured running a command: {result.ToString()}.");
         }
 
