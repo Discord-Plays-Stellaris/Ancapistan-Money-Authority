@@ -1,4 +1,6 @@
 # An economy bot for a discord guild called Discord Plays Stellaris 
+
+## THIS BOT IS CURRENTLY BEING PORTED TO C# AND MAY BE MERGED WITH ANOTHER
   
 Some of the functions in it are currently disabled due to them being broken or useless, or both.  
 This code runs but might be unstable, who knows?  
