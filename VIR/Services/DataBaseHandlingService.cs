@@ -15,6 +15,7 @@ namespace VIR.Services
 {
     public class DataBaseHandlingService
     {
+        //TODO: Needs comments
         private readonly RethinkDB r = RethinkDB.R;
         private readonly Connection conn;
         
@@ -42,15 +43,25 @@ namespace VIR.Services
             }
         }
 
-        public async Task setFieldAsync<T>(string userid, string fieldName, T value) {
-            await r.Db("wealth").Table("users").Get(userid).Update(r.HashMap(fieldName,value)).RunAsync(conn);
+        public async Task SetFieldAsync<T>(string userid, string fieldName, T value) {
+            await r.Db("wealth").Table("users").Insert(r.HashMap("id",userid).With(fieldName, value)).OptArg("conflict", "update").RunAsync(conn);
         }
 
-        public string getFieldAsync(string userid, string fieldName)
+        public async Task<string> GetFieldAsync(string userid, string fieldName)
         {
-            var rawStr = r.Db("wealth").Table("users").Get(userid).Run(conn).ToString();
-            JObject Str = JObject.Parse(rawStr);
-            return (string) Str[fieldName];
+            JObject rawStr = await r.Db("wealth").Table("users").Get(userid).RunAsync(conn);
+            if (rawStr == null)
+                return null;
+
+            if(rawStr[fieldName] == null)
+                return null;
+
+            return rawStr[fieldName].ToString();
         } 
+        
+        public async Task RemoveUserAsync(string userid)
+        {
+            await r.Db("wealth").Table("users").Get(userid).Delete().RunAsync(conn);
+        }
     }
 }

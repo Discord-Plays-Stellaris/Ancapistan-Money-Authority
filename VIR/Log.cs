@@ -8,6 +8,7 @@ namespace VIR
 {
     class Log
     {
+        //TODO: Comment this
         public static Exception UnknownTypeException { get; private set; }
 
         public enum Logs

@@ -11,6 +11,7 @@ namespace VIR.Modules.Preconditions
 {
     public class HasMasterOfBotsAttribute : PreconditionAttribute
     {
+        //TODO: Comments required
         public async override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             var user = context.User as SocketGuildUser;

@@ -17,13 +17,11 @@ namespace VIR.Services
         private readonly CommandService __commands;
         private readonly DiscordSocketClient __client;
         private readonly IServiceProvider __services;
-        private readonly DataBaseHandlingService __db;
 
         public CommandHandlingService(IServiceProvider services)
         {
             __commands = services.GetRequiredService<CommandService>();
             __client = services.GetRequiredService<DiscordSocketClient>();
-            __db = services.GetRequiredService<DataBaseHandlingService>();
             __services = services;
 
             //__commands.CommandExecuted += CommandExecutedAsync;
@@ -56,6 +54,13 @@ namespace VIR.Services
                 return;*/
 
             //await Log.Logger(Log.Logs.INFO, result.IsSuccess.ToString());
+            if(result.Error == null)
+            {
+                return;
+            }
+
+            if (result.Error.Value == CommandError.UnknownCommand)
+                return;
 
             if (result.Error.Value == CommandError.UnmetPrecondition)
             {

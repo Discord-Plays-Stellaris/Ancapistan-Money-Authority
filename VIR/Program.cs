@@ -22,7 +22,7 @@ namespace VIR
             using (var services = ConfigureServices())
             {
                 var __client = services.GetRequiredService<DiscordSocketClient>(); //Create a new client in the Client Variable
-                
+
                 __client.Log += LogAsync;
                 await __client.LoginAsync(TokenType.Bot, Properties.Resources.token); //Log in the bot
                 await __client.StartAsync(); //Start the bot
@@ -40,14 +40,16 @@ namespace VIR
             return Task.CompletedTask;
         }
 
+        //Initialise all services
         private ServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
-                .AddSingleton<HttpClient>()
-                .AddSingleton<DataBaseHandlingService>()
+                .AddSingleton<DiscordSocketClient>() //Discord Client Service
+                .AddSingleton<CommandService>() //Command Service
+                .AddSingleton<CommandHandlingService>() //Command Handling Service
+                .AddSingleton<HttpClient>() //HTTP client
+                .AddSingleton<DataBaseHandlingService>() //Database Handling Service, manipulates rDB data
+                .AddSingleton<AgeService>() //Age Service, sort of a wrapper for Database Handling Service
                 .BuildServiceProvider();
         }
     }

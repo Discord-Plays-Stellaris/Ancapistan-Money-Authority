@@ -11,7 +11,9 @@ namespace VIR.Modules
     {
         [Command("ping")]
         [Alias("pong")]
-        public Task PingAsync()
-            => ReplyAsync("Pong! Ping! Wait what?");
+        public async Task PingAsync()
+        {
+            await ReplyAsync("Pong! Ping! Wait what?");
+        }
     }
 }

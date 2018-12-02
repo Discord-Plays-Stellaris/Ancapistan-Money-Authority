@@ -177,6 +177,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Services\AgeService.cs" />
     <Compile Include="Services\CommandHandlingService.cs" />
     <Compile Include="Services\DataBaseHandlingService.cs" />
   </ItemGroup>
