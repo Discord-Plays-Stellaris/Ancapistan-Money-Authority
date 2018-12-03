@@ -8,6 +8,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using VIR.Services;
 
 namespace VIR
@@ -43,9 +44,11 @@ namespace VIR
         //Initialise all services
         private ServiceProvider ConfigureServices()
         {
+            DiscordSocketClient tmp2 = new DiscordSocketClient(new DiscordSocketConfig { HandlerTimeout = null, });
+            CommandService tmp = new CommandService(new CommandServiceConfig{CaseSensitiveCommands = false, DefaultRunMode = RunMode.Async, }); //Command Handling Service
             return new ServiceCollection()
-                .AddSingleton<DiscordSocketClient>() //Discord Client Service
-                .AddSingleton<CommandService>() //Command Service
+                .AddSingleton(tmp2) //Discord Client Service
+                .AddSingleton(tmp) //Command Service
                 .AddSingleton<CommandHandlingService>() //Command Handling Service
                 .AddSingleton<HttpClient>() //HTTP client
                 .AddSingleton<DataBaseHandlingService>() //Database Handling Service, manipulates rDB data

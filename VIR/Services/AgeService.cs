@@ -26,41 +26,38 @@ namespace VIR.Services
             {
                 if (x.IsBot)
                 {
-                    return;
+                    continue;
                 }
-                string aget;
+                string ageTemporary;
                 int age;
-                aget = await __database.GetFieldAsync(x.Id.ToString(), "age");
-                if(aget == null) {
+                ageTemporary = await __database.GetFieldAsync(x.Id.ToString(), "age");
+                if(ageTemporary == null) {
                     Random rand = new Random(); //Set up a RNG
                     age = rand.Next(20, 25); //Get num between 20 and 25
-                } else
-                {
-                    age = int.Parse(aget);
+                } else {
+                    age = int.Parse(ageTemporary);
                 }
                 int ageNew = age + amount;
                 await __database.SetFieldAsync(x.Id.ToString(), "age", ageNew);
                 int pp;
-                string ppt;
-                ppt = await __database.GetFieldAsync(x.Id.ToString(), "pp");
-                if(ppt == null) {
+                string ppTemporary;
+                ppTemporary = await __database.GetFieldAsync(x.Id.ToString(), "pp");
+                if(ppTemporary == null) {
                     pp = 0;
-                } else
-                {
-                    pp = int.Parse(ppt);
+                } else {
+                    pp = int.Parse(ppTemporary);
                 }
-                int newpp = ((pp / 100) * amount);
+                int newpp = pp - (int) Math.Floor(((double.Parse(pp.ToString()) / 100) * amount));
                 await __database.SetFieldAsync(x.Id.ToString(), "pp", newpp);
                 int expectancy;
-                string texpectancy;
-                texpectancy = await __database.GetFieldAsync(x.Id.ToString(), "expectancy");
-                if(texpectancy == null) {
+                string expectancyTemporary;
+                expectancyTemporary = await __database.GetFieldAsync(x.Id.ToString(), "expectancy");
+                if(expectancyTemporary == null) {
                     Random rand = new Random(); //Set up a RNG
                     expectancy = rand.Next(90, 130); //Get num between 90 and 130
                     await __database.SetFieldAsync(x.Id.ToString(), "expectancy", expectancy);
-                } else
-                {
-                    expectancy = int.Parse(texpectancy);
+                } else {
+                    expectancy = int.Parse(expectancyTemporary);
                 }
                 if(ageNew >= expectancy) {
                     await KillAsync(x);

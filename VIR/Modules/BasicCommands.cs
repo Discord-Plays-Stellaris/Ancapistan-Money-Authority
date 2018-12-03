@@ -13,6 +13,7 @@ namespace VIR.Modules
         [Alias("pong")]
         public async Task PingAsync()
         {
+            System.Threading.Thread.Sleep(15000);
             await ReplyAsync("Pong! Ping! Wait what?");
         }
     }
