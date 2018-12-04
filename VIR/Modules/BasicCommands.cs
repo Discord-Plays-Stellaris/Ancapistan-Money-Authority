@@ -13,7 +13,7 @@ namespace VIR.Modules
         [Alias("pong")]
         public async Task PingAsync()
         {
-            await ReplyAsync("Pong! Ping! Wait what?");
+            await ReplyAsync("Pong! Ping! Wait what? :ping_pong:");
         }
     }
 }
