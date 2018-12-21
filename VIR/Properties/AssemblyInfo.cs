@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Ancapistan Monetary Authority")]
-[assembly: AssemblyDescription("An economy bot for Discord.")]
+[assembly: AssemblyDescription("An economy bot for Discord")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Discord Plays Stellaris Dev Team")]
 [assembly: AssemblyProduct("Ancapistan Monetary Authority Discord Bot")]
