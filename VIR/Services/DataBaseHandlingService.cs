@@ -29,7 +29,7 @@ namespace VIR.Services
             {
                 if (Convert.ToString(Environment.OSVersion.Platform) == "Unix")
                 {
-                    Console.WriteLine("As this is a Unix machine, the bot cannot automatically open RethinkDB. Please enter rethinkdb into a console to start it.");
+                    Console.WriteLine("\nAs this is a Unix machine, the bot cannot automatically open RethinkDB. Please enter rethinkdb into a console to start it.");
                     Environment.Exit(0);
                 }
 
