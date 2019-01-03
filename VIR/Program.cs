@@ -44,7 +44,7 @@ namespace VIR
         //Initialise all services
         private ServiceProvider ConfigureServices()
         {
-            DiscordSocketClient tmp2 = new DiscordSocketClient(new DiscordSocketConfig { HandlerTimeout = null, });
+            DiscordSocketClient tmp2 = new DiscordSocketClient(new DiscordSocketConfig { HandlerTimeout = null, WebSocketProvider = Discord.Net.Providers.WS4Net.WS4NetProvider.Instance });
             CommandService tmp = new CommandService(new CommandServiceConfig{CaseSensitiveCommands = false, DefaultRunMode = RunMode.Async, }); //Command Handling Service
             return new ServiceCollection()
                 .AddSingleton(tmp2) //Discord Client Service
