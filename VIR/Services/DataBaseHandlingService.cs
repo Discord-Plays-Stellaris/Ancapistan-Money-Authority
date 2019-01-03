@@ -27,6 +27,12 @@ namespace VIR.Services
                 conn = r.Connection().Hostname("127.0.0.1").Timeout(60).Connect();
             } catch(Exception e)
             {
+                if (Convert.ToString(Environment.OSVersion.Platform) == "Unix")
+                {
+                    Console.WriteLine("As this is a Unix machine, the bot cannot automatically open RethinkDB. Please enter rethinkdb into a console to start it.");
+                    Environment.Exit(0);
+                }
+
                 Process rdb = new Process();
                 rdb.StartInfo.UseShellExecute = false;
                 rdb.StartInfo.FileName = Resources.RethinkDBExec + "rethinkdb.exe";
