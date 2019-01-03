@@ -43,13 +43,13 @@ namespace VIR.Services
             }
         }
 
-        public async Task SetFieldAsync<T>(string userid, string fieldName, T value) {
-            await r.Db("wealth").Table("users").Insert(r.HashMap("id",userid).With(fieldName, value)).OptArg("conflict", "update").RunAsync(conn);
+        public async Task SetFieldAsync<T>(string userid, string fieldName, T value, string tableName) {
+            await r.Db("root").Table(tableName).Insert(r.HashMap("id",userid).With(fieldName, value)).OptArg("conflict", "update").RunAsync(conn);
         }
 
-        public async Task<string> GetFieldAsync(string userid, string fieldName)
+        public async Task<string> GetFieldAsync(string userid, string fieldName, string tableName)
         {
-            JObject rawStr = await r.Db("wealth").Table("users").Get(userid).RunAsync(conn);
+            JObject rawStr = await r.Db("root").Table(tableName).Get(userid).RunAsync(conn);
             if (rawStr == null)
                 return null;
 

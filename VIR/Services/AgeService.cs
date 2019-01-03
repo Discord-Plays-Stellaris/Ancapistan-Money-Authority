@@ -30,7 +30,7 @@ namespace VIR.Services
                 }
                 string ageTemporary;
                 int age;
-                ageTemporary = await __database.GetFieldAsync(x.Id.ToString(), "age");
+                ageTemporary = await __database.GetFieldAsync(x.Id.ToString(), "age", "users");
                 if(ageTemporary == null) {
                     Random rand = new Random(); //Set up a RNG
                     age = rand.Next(20, 25); //Get num between 20 and 25
@@ -38,24 +38,24 @@ namespace VIR.Services
                     age = int.Parse(ageTemporary);
                 }
                 int ageNew = age + amount;
-                await __database.SetFieldAsync(x.Id.ToString(), "age", ageNew);
+                await __database.SetFieldAsync(x.Id.ToString(), "age", ageNew, "users");
                 int pp;
                 string ppTemporary;
-                ppTemporary = await __database.GetFieldAsync(x.Id.ToString(), "pp");
+                ppTemporary = await __database.GetFieldAsync(x.Id.ToString(), "pp", "users");
                 if(ppTemporary == null) {
                     pp = 0;
                 } else {
                     pp = int.Parse(ppTemporary);
                 }
                 int newpp = pp - (int) Math.Floor(((double.Parse(pp.ToString()) / 100) * amount));
-                await __database.SetFieldAsync(x.Id.ToString(), "pp", newpp);
+                await __database.SetFieldAsync(x.Id.ToString(), "pp", newpp, "users");
                 int expectancy;
                 string expectancyTemporary;
-                expectancyTemporary = await __database.GetFieldAsync(x.Id.ToString(), "expectancy");
+                expectancyTemporary = await __database.GetFieldAsync(x.Id.ToString(), "expectancy", "users");
                 if(expectancyTemporary == null) {
                     Random rand = new Random(); //Set up a RNG
                     expectancy = rand.Next(90, 130); //Get num between 90 and 130
-                    await __database.SetFieldAsync(x.Id.ToString(), "expectancy", expectancy);
+                    await __database.SetFieldAsync(x.Id.ToString(), "expectancy", expectancy, "users");
                 } else {
                     expectancy = int.Parse(expectancyTemporary);
                 }

@@ -32,7 +32,7 @@ namespace VIR.Services
 
         public async Task InitializeAsync()
         {
-            await __commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            await __commands.AddModulesAsync(Assembly.GetEntryAssembly(), __services);
         }
 
         public async Task MessageReceivedAsync(SocketMessage msg)
