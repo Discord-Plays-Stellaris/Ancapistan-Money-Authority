@@ -47,6 +47,11 @@ namespace VIR.Services
             await r.Db("root").Table(tableName).Insert(r.HashMap("id",userid).With(fieldName, value)).OptArg("conflict", "update").RunAsync(conn);
         }
 
+        public async Task SetJObjectAsync(string userid, JObject obj, string tableName)
+        {
+            await r.Db("root").Table(tableName).Insert(r.HashMap("id", userid).With(obj)).OptArg("conflict", "update").RunAsync(conn);
+        }
+
         public async Task<string> GetFieldAsync(string userid, string fieldName, string tableName)
         {
             JObject rawStr = await r.Db("root").Table(tableName).Get(userid).RunAsync(conn);
@@ -62,6 +67,11 @@ namespace VIR.Services
         public async Task RemoveUserAsync(string userid)
         {
             await r.Db("wealth").Table("users").Get(userid).Delete().RunAsync(conn);
+        }
+
+        public async Task<JObject> getJObjectAsync(string id, string tableName)
+        {
+            return await r.Db("root").Table(tableName).Get(id).RunAsync(conn);
         }
     }
 }
