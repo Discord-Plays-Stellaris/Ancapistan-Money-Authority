@@ -56,24 +56,29 @@ namespace VIR.Services
             //await Log.Logger(Log.Logs.INFO, result.IsSuccess.ToString());
             if(result.Error == null)
             {
+                Console.WriteLine("Result Error Null");
+;                return;
+            }
+            if (result.Error.Value == CommandError.UnknownCommand)
+            {
+                Console.WriteLine("Unknown Command");
                 return;
             }
-
-            if (result.Error.Value == CommandError.UnknownCommand)
-                return;
-
             if (result.Error.Value == CommandError.UnmetPrecondition)
             {
                 await context.Channel.SendMessageAsync($"The following condition has failed: {result.ErrorReason}");
+                Console.WriteLine("Unmet Precondition");
                 return;
             }
             if(result.Error.Value == CommandError.BadArgCount)
             {
                 await context.Channel.SendMessageAsync($"Not enough arguments for the command!");
+                Console.WriteLine("Not enough arguments");
                 return;
             }
 
             if (result.IsSuccess)
+                Console.WriteLine("Succes!");
                 return;
             await context.Channel.SendMessageAsync($"There was an error running the command, please try it again and if the problem persists contact towergame#9726. {result.ErrorReason}");
             await Log.Logger(Log.Logs.ERROR, $"A problem occured running a command: {result.ToString()}.");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -20,12 +21,17 @@ namespace VIR
 
         public async Task MainAsync()
         {
+
             using (var services = ConfigureServices())
             {
                 var __client = services.GetRequiredService<DiscordSocketClient>(); //Create a new client in the Client Variable
 
                 __client.Log += LogAsync;
-                await __client.LoginAsync(TokenType.Bot, Properties.Resources.token); //Log in the bot
+
+                const string tokenPath = @"token.txt";
+                string botToken = File.ReadAllText(tokenPath);
+
+                await __client.LoginAsync(TokenType.Bot, botToken); //Log in the bot
                 await __client.StartAsync(); //Start the bot
 
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
