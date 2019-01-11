@@ -192,7 +192,9 @@
     <Compile Include="Modules\BasicCommands.cs" />
     <Compile Include="Modules\CompanyCommands.cs" />
     <Compile Include="Modules\DataBaseCommands.cs" />
-    <Compile Include="Modules\Objects\Company.cs" />
+    <Compile Include="Modules\Objects\Company\Company.cs" />
+    <Compile Include="Modules\Objects\Company\Employee.cs" />
+    <Compile Include="Modules\Objects\Company\Position.cs" />
     <Compile Include="Modules\Preconditions\HasMasterOfBotsAttribute.cs" />
     <Compile Include="Modules\Preconditions\IsInDPSGuildAttribute.cs" />
     <Compile Include="Program.cs" />

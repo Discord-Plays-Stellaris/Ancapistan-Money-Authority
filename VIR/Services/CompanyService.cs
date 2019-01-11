@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
-using VIR.Modules.Objects;
+using VIR.Modules.Objects.Company;
 
 namespace VIR.Services
 {
