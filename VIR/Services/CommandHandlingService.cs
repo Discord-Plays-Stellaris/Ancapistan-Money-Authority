@@ -3,10 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace VIR.Services
@@ -78,7 +75,7 @@ namespace VIR.Services
             }
 
             if (result.IsSuccess) { 
-                Console.WriteLine("Success!");
+                //Console.WriteLine("Success!");
                 return;
             }   
             await context.Channel.SendMessageAsync($"There was an error running the command, please try it again and if the problem persists contact towergame#9726. {result.ErrorReason}");
