@@ -54,6 +54,7 @@ namespace VIR
                 .AddSingleton<HttpClient>() //HTTP client
                 .AddSingleton<DataBaseHandlingService>() //Database Handling Service, manipulates rDB data
                 .AddSingleton<AgeService>() //Age Service, sort of a wrapper for Database Handling Service
+                .AddSingleton<CompanyService>()
                 .BuildServiceProvider();
         }
     }
