@@ -48,9 +48,9 @@ namespace VIR.Services
             await r.Db("root").Table(tableName).Insert(r.HashMap("id",userid).With(fieldName, value)).OptArg("conflict", "update").RunAsync(conn);
         }
 
-        public async Task SetJObjectAsync(string userid, JObject obj, string tableName)
+        public async Task SetJObjectAsync(JObject obj, string tableName)
         {
-            await r.Db("root").Table(tableName).Insert(r.HashMap("id", userid).With(obj)).OptArg("conflict", "update").RunAsync(conn);
+            await r.Db("root").Table(tableName).Insert(obj).OptArg("conflict", "update").RunAsync(conn);
         }
 
         public async Task<string> GetFieldAsync(string userid, string fieldName, string tableName)

@@ -53,24 +53,24 @@ namespace VIR.Services
             //await Log.Logger(Log.Logs.INFO, result.IsSuccess.ToString());
             if (result.Error == null)
             {
-                Console.WriteLine("Result Error Null");
-                ; return;
+                //Console.WriteLine("Result Error Null");
+                return;
             }
             if (result.Error.Value == CommandError.UnknownCommand)
             {
-                Console.WriteLine("Unknown Command");
+                //Console.WriteLine("Unknown Command");
                 return;
             }
             if (result.Error.Value == CommandError.UnmetPrecondition)
             {
                 await context.Channel.SendMessageAsync($"The following condition has failed: {result.ErrorReason}");
-                Console.WriteLine("Unmet Precondition");
+                //Console.WriteLine("Unmet Precondition");
                 return;
             }
             if (result.Error.Value == CommandError.BadArgCount)
             {
                 await context.Channel.SendMessageAsync($"Not enough arguments for the command!");
-                Console.WriteLine("Not enough arguments");
+                //Console.WriteLine("Not enough arguments");
                 return;
             }
 
