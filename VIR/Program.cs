@@ -6,6 +6,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using VIR.Services;
+using VIR.Properties;
 
 namespace VIR
 {
@@ -23,8 +24,7 @@ namespace VIR
 
                 __client.Log += LogAsync;
 
-                const string tokenPath = @"token.txt";
-                string botToken = File.ReadAllText(tokenPath);
+                string botToken = Resources.token;
 
                 await __client.LoginAsync(TokenType.Bot, botToken); //Log in the bot
                 await __client.StartAsync(); //Start the bot

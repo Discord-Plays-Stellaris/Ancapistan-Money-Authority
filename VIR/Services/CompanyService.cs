@@ -22,5 +22,5 @@ namespace VIR.Services
         {
             await __database.SetJObjectAsync(company.ticker, company.serializeIntoJObject(), "companies");
         }
-    }
+    } 
 }

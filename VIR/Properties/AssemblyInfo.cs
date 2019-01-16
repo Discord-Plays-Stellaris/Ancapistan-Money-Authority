@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Discord Plays Stellaris Dev Team")]
 [assembly: AssemblyProduct("Ancapistan Monetary Authority Discord Bot")]
-[assembly: AssemblyCopyright("Copyright © 2018 GNU Affero General Public License v3.0")]
+[assembly: AssemblyCopyright("Copyright © 2019 GNU Affero General Public License v3.0")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
