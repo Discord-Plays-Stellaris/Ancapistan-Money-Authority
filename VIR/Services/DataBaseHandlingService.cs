@@ -44,15 +44,37 @@ namespace VIR.Services
             }
         }
 
+        /// <summary>
+        /// Sets a specific field within an object.
+        /// </summary>
+        /// <typeparam name="T">The object type of the field's value.</typeparam>
+        /// <param name="userid">The ID of the document</param>
+        /// <param name="fieldName">The name of the field</param>
+        /// <param name="value">The value of the field</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <returns></returns>
         public async Task SetFieldAsync<T>(string userid, string fieldName, T value, string tableName) {
             await r.Db("root").Table(tableName).Insert(r.HashMap("id",userid).With(fieldName, value)).OptArg("conflict", "update").RunAsync(conn);
         }
 
+        /// <summary>
+        /// Inserts a JObject into a table. If an object with that ID already exists, then update it.
+        /// </summary>
+        /// <param name="obj">The JObject to be inserted</param>
+        /// <param name="tableName">The table of the object.</param>
+        /// <returns></returns>
         public async Task SetJObjectAsync(JObject obj, string tableName)
         {
             await r.Db("root").Table(tableName).Insert(obj).OptArg("conflict", "update").RunAsync(conn);
         }
 
+        /// <summary>
+        /// Gets a specific field from a document.
+        /// </summary>
+        /// <param name="userid">The document ID</param>
+        /// <param name="fieldName">The field to be retrived</param>
+        /// <param name="tableName">The name of the table of the document.</param>
+        /// <returns></returns>
         public async Task<string> GetFieldAsync(string userid, string fieldName, string tableName)
         {
             JObject rawStr = await r.Db("root").Table(tableName).Get(userid).RunAsync(conn);
@@ -65,14 +87,35 @@ namespace VIR.Services
             return rawStr[fieldName].ToString();
         } 
         
+        /// <summary>
+        /// Removes a user from the DB
+        /// </summary>
+        /// <param name="userid">The ID of the user</param>
+        /// <returns></returns>
         public async Task RemoveUserAsync(string userid)
         {
             await r.Db("wealth").Table("users").Get(userid).Delete().RunAsync(conn);
         }
 
+        /// <summary>
+        /// Gets a JObject from the database.
+        /// </summary>
+        /// <param name="id">The ID of the document</param>
+        /// <param name="tableName">The table of the document</param>
+        /// <returns>A JObject</returns>
         public async Task<JObject> getJObjectAsync(string id, string tableName)
         {
             return await r.Db("root").Table(tableName).Get(id).RunAsync(conn);
+        }
+
+        /// <summary>
+        /// Returns all the IDs in a table
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns>An array with all of the IDs</returns>
+        public async Task<string[]> getIDs(string tableName)
+        {
+            return null;
         }
     }
 }

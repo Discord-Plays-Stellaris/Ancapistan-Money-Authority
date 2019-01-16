@@ -6,6 +6,9 @@ using System.Linq;
 
 namespace VIR.Modules.Objects.Company
 {
+    /// <summary>
+    /// A class for an instance of a company
+    /// </summary>
     public class Company
     {
         public string ticker;
