@@ -16,7 +16,7 @@ namespace VIR.Modules
 
         [Command("quit")]
         [HasMasterOfBots]
-        public async Task SkipperAsync()
+        public async Task QuitAsync()
         {
             await ReplyAsync("Quitting...");
             Environment.Exit(0);

@@ -11,6 +11,9 @@ using VIR.Services;
 
 namespace VIR.Modules
 {
+    /// <summary>
+    /// Contains async methods regarding corporations
+    /// </summary>
     public class CompanyCommands : ModuleBase<SocketCommandContext>
     {
         private readonly CompanyService CompanyService;
@@ -23,7 +26,7 @@ namespace VIR.Modules
         }
 
         [Command("createcompany")]
-        [Alias("createcorporation")]
+        [Alias("createcorporation", "addcompany", "addcorporation")]
         [HasMasterOfBots]
         public async Task CreateCompanyTask(string ticker, [Remainder]string name)
         {
