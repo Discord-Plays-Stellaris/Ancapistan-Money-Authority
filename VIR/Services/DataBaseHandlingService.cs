@@ -2,6 +2,7 @@
 using RethinkDb.Driver;
 using RethinkDb.Driver.Net;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using VIR.Properties;
@@ -77,7 +78,7 @@ namespace VIR.Services
         /// <param name="fieldName">The field to be retrived</param>
         /// <param name="tableName">The name of the table of the document.</param>
         /// <returns></returns>
-        public async Task<string> GetFieldAsync(string userid, string fieldName, string tableName)
+        public async Task<JToken> GetFieldAsync(string userid, string fieldName, string tableName)
         {
             JObject rawStr = await r.Db("root").Table(tableName).Get(userid).RunAsync(conn);
             if (rawStr == null)
@@ -86,7 +87,7 @@ namespace VIR.Services
             if(rawStr[fieldName] == null)
                 return null;
 
-            return rawStr[fieldName].ToString();
+            return rawStr[fieldName];
         } 
         
         /// <summary>
@@ -127,14 +128,14 @@ namespace VIR.Services
         /// Returns all the IDs in a table in an array
         /// </summary>
         /// <param name="tableName">The table to get IDs from</param>
-        /// <returns>An array</returns>
-        public async Task<Collection<string>> GetIDs(string tableName)
+        /// <returns>A collection with all of the IDs</returns>
+        public async Task<Collection<string>> getIDs(string tableName)
         {
             Collection<string> ids = new Collection<string>();
-            JArray allEntries = await r.Db("root").Table(tableName).RunAsync(conn);
-            foreach (JObject x in allEntries)
+            Cursor<JObject> allEntries = await r.Db("root").Table(tableName).RunAsync<JObject>(conn);
+            foreach(JObject x in allEntries)
             {
-                ids.Add((string)x["id"]);
+                ids.Add((string) x["id"]);
             }
             return ids;
         }

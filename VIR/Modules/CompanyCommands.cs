@@ -63,18 +63,15 @@ namespace VIR.Modules
 
         [Command("companies")]
         [Alias("corporations")]
-        public async Task GetCompanyListAsync()
+        public async Task GetCompaniesTask()
         {
-            /*var eb = new Discord.EmbedBuilder();
-            eb.WithTitle("Company List");
-            eb.WithDescription("This is a list of all current companies");
-            eb.WithColor(Discord.Color.Blue);
-
-            await ReplyAsync(Convert.ToString(dataBaseService.GetIDs("companies")));
-
-            await ReplyAsync("", false, eb.Build());*/
-
-            //ReplyAsync("```JSON\n" + dataBaseService.TempMethodForTablePrinting("companies") + "```");
+            string tmp = "";
+            Collection<string> ids = await dataBaseService.getIDs("companies");
+            foreach(string x in ids)
+            {
+                tmp += ids + "\n";
+            }
+            await ReplyAsync($"Current Companies:\n{tmp}");
         }
     }
 }

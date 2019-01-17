@@ -28,7 +28,7 @@ namespace VIR.Modules
             if (user == null)
             {
                 user = user ?? Context.User;
-                aget = await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), "age", "users");
+                aget = (string) await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), "age", "users");
                 if (aget == null)
                 {
                     Random rand = new Random(); //Set up a RNG
@@ -41,7 +41,7 @@ namespace VIR.Modules
                 }
                 string PPt;
                 int pp;
-                PPt = await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), "pp", "users");
+                PPt = (string) await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), "pp", "users");
                 if(PPt == null) {
                     pp = 0;
                     await DataBaseHandlingService.SetFieldAsync(user.Id.ToString(), "pp", pp, "users");
@@ -55,7 +55,7 @@ namespace VIR.Modules
                 await ReplyAsync("Your balance was sent to you privately.");
                 return;
             }
-            aget = await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), "age", "users");
+            aget = (string) await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), "age", "users");
             if(aget == null) {
                 Random rand = new Random(); //Set up a RNG
                 age = rand.Next(20, 25); //Get num between 20 and 25
@@ -72,7 +72,7 @@ namespace VIR.Modules
         [IsInDPSGuild]
         public async Task GetAsync([Summary("Field to get")] string field, [Summary("User")] IUser user)
         {
-            string result = await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), field, "users");
+            string result = (string) await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), field, "users");
             await ReplyAsync($"{field} value: {result}");
         }
 
@@ -90,7 +90,7 @@ namespace VIR.Modules
         [IsInDPSGuild]
         public async Task AddAsync([Summary("Field to get")] string field, [Summary("User")] IUser user, [Summary("Value to add")] int value)
         {
-            string x = await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), field, "users");
+            string x = (string) await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), field, "users");
             int val;
             if (x == null)
             {
