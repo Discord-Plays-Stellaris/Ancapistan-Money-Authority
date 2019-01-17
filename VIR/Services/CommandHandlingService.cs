@@ -87,5 +87,16 @@ namespace VIR.Services
             Log.Logger(Log.Logs.INFO, log.ToString());
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// Posts a message to the specified channel
+        /// </summary>
+        /// <param name="channel">The channel to post the message in</param>
+        /// <param name="message">The message to be posted.</param>
+        /// <returns></returns>
+        public async Task PostMessageTask(string channel, string message)
+        {
+            await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync(message);
+        }
     }
 }

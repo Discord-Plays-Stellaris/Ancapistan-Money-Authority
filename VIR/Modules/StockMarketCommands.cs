@@ -1,5 +1,6 @@
 ﻿using Discord.Commands;
 using Discord;
+using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,13 @@ namespace VIR.Modules
 {
     public class StockMarketCommands : ModuleBase
     {
-        DataBaseHandlingService db;
+        private readonly DataBaseHandlingService db;
+        private readonly CommandHandlingService CommandService;
 
-        public StockMarketCommands()
+        public StockMarketCommands(DataBaseHandlingService input, CommandHandlingService inputCommandService)
         {
-            db = new DataBaseHandlingService();
+            db = input;
+            CommandService = inputCommandService;
         }
 
         [Command("namemarket")]
@@ -39,8 +42,8 @@ namespace VIR.Modules
         [Alias("marketinfo")]
         public async Task MarketInfoTask()
         {
-            string name = await db.GetFieldAsync("MarketInfo", "marketName", "system");
-            string acronym = await db.GetFieldAsync("MarketInfo", "acronym", "system");
+            string name = Convert.ToString(await db.GetFieldAsync("MarketInfo", "marketName", "system"));
+            string acronym = Convert.ToString(await db.GetFieldAsync("MarketInfo", "acronym", "system"));
 
             EmbedFieldBuilder marketNameField = new EmbedFieldBuilder().WithIsInline(false).WithName("Market Name:").WithValue(name + " (" + acronym + ")");
             EmbedFieldBuilder marketChannelField = new EmbedFieldBuilder().WithIsInline(false).WithName("Market Channel").WithValue($"<#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");
@@ -61,7 +64,10 @@ namespace VIR.Modules
             JObject JSONChannel = await db.SerializeObject<StockMarketChannel>(channelObj);
             db.SetJObjectAsync(JSONChannel, "system");
 
-            ReplyAsync($"Market channel set to <#{channel}>");
+            await CommandService.PostMessageTask(channel, "This channel has been set as the transaction announcement channel!");
+
+            await ReplyAsync($"Market channel set to <#{channel}>");
+            
         }
     }
 }
