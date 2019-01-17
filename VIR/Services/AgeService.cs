@@ -29,7 +29,7 @@ namespace VIR.Services
                 }
                 string ageTemporary;
                 int age;
-                ageTemporary = await __database.GetFieldAsync(x.Id.ToString(), "age", "users");
+                ageTemporary = (string) await __database.GetFieldAsync(x.Id.ToString(), "age", "users");
                 if(ageTemporary == null) {
                     Random rand = new Random(); //Set up a RNG
                     age = rand.Next(20, 25); //Get num between 20 and 25
@@ -40,7 +40,7 @@ namespace VIR.Services
                 await __database.SetFieldAsync(x.Id.ToString(), "age", ageNew, "users");
                 int pp;
                 string ppTemporary;
-                ppTemporary = await __database.GetFieldAsync(x.Id.ToString(), "pp", "users");
+                ppTemporary = (string) await __database.GetFieldAsync(x.Id.ToString(), "pp", "users");
                 if(ppTemporary == null) {
                     pp = 0;
                 } else {
@@ -50,7 +50,7 @@ namespace VIR.Services
                 await __database.SetFieldAsync(x.Id.ToString(), "pp", newpp, "users");
                 int expectancy;
                 string expectancyTemporary;
-                expectancyTemporary = await __database.GetFieldAsync(x.Id.ToString(), "expectancy", "users");
+                expectancyTemporary = (string) await __database.GetFieldAsync(x.Id.ToString(), "expectancy", "users");
                 if(expectancyTemporary == null) {
                     Random rand = new Random(); //Set up a RNG
                     expectancy = rand.Next(90, 130); //Get num between 90 and 130

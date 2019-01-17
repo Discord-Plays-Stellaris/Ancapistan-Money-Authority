@@ -60,8 +60,18 @@ namespace VIR.Modules
             await ReplyAsync("Company successfully created!");
         }
 
-        //[Command("companies")]
-        //[Alias("corporations")]
+        [Command("companies")]
+        [Alias("corporations")]
+        public async Task GetCompaniesTask()
+        {
+            string tmp = "";
+            Collection<string> ids = await dataBaseService.getIDs("companies");
+            foreach(string x in ids)
+            {
+                tmp += ids + "\n";
+            }
+            await ReplyAsync($"Current Companies:\n{tmp}");
+        }
 
     }
 }
