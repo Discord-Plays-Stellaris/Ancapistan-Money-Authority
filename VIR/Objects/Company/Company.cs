@@ -17,15 +17,20 @@ namespace VIR.Modules.Objects.Company
         //public Dictionary<string, int> assets; //thing, amount
         public Dictionary<string, Position> positions;
         public int money;
+        public int shares;
+        public double SharePrice;
         public Company()
         {
-
+            SharePrice = 0;
+            money = 0;
         }
         public Company(JObject companyDbEntry)
         {
             ticker = (string)companyDbEntry["id"];
             name = (string)companyDbEntry["name"];
             money = (int)companyDbEntry["money"];
+            shares = (int)companyDbEntry["shares"];
+            SharePrice = (double)companyDbEntry["SharePrice"];
             foreach(JObject entry in (Array) companyDbEntry["employee"])
             {
                 employee.Add((string)entry["id"], new Employee(entry));
@@ -37,6 +42,8 @@ namespace VIR.Modules.Objects.Company
             temp["name"] = name;
             temp["money"] = money;
             temp["id"] = ticker;
+            temp["shares"] = shares;
+            temp["SharePrice"] = SharePrice;
             Collection<JObject> employeeDeserialise = new Collection<JObject>();
             foreach(Employee x in employee.Values)
             {

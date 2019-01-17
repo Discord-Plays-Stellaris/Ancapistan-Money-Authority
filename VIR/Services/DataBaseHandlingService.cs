@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using VIR.Properties;
+using Newtonsoft.Json;
+using System.Collections.ObjectModel;
 
 namespace VIR.Services
 {
@@ -109,13 +111,32 @@ namespace VIR.Services
         }
 
         /// <summary>
-        /// Returns all the IDs in a table
+        /// Converts an object to a JObject
         /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns>An array with all of the IDs</returns>
-        public async Task<string[]> getIDs(string tableName)
+        /// <typeparam name="T">The type of the input object.</typeparam>
+        /// <param name="input">The input object</param>
+        /// <returns>A JObject</returns>
+        public async Task<JObject> SerializeObject<T>(T input)
         {
-            return null;
+            string JSONString = JsonConvert.SerializeObject(input);
+            JObject jObject = JObject.Parse(JSONString);
+            return jObject;
+        }
+
+        /// <summary>
+        /// Returns all the IDs in a table in an array
+        /// </summary>
+        /// <param name="tableName">The table to get IDs from</param>
+        /// <returns>An array</returns>
+        public async Task<Collection<string>> GetIDs(string tableName)
+        {
+            Collection<string> ids = new Collection<string>();
+            JArray allEntries = await r.Db("root").Table(tableName).RunAsync(conn);
+            foreach (JObject x in allEntries)
+            {
+                ids.Add((string)x["id"]);
+            }
+            return ids;
         }
     }
 }

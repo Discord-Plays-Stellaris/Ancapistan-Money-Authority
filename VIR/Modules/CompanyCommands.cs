@@ -28,10 +28,11 @@ namespace VIR.Modules
         [Command("createcompany")]
         [Alias("createcorporation", "addcompany", "addcorporation")]
         [HasMasterOfBots]
-        public async Task CreateCompanyTask(string ticker, [Remainder]string name)
+        public async Task CreateCompanyTask(string ticker, int startingShares, [Remainder]string name)
         {
             Company company = new Company();
             company.name = name;
+            company.shares = startingShares;
             company.ticker = ticker;
             company.employee = new Dictionary<string, Employee>();
             Employee employee = new Employee();
@@ -60,8 +61,20 @@ namespace VIR.Modules
             await ReplyAsync("Company successfully created!");
         }
 
-        //[Command("companies")]
-        //[Alias("corporations")]
+        [Command("companies")]
+        [Alias("corporations")]
+        public async Task GetCompanyListAsync()
+        {
+            /*var eb = new Discord.EmbedBuilder();
+            eb.WithTitle("Company List");
+            eb.WithDescription("This is a list of all current companies");
+            eb.WithColor(Discord.Color.Blue);
 
+            await ReplyAsync(Convert.ToString(dataBaseService.GetIDs("companies")));
+
+            await ReplyAsync("", false, eb.Build());*/
+
+            //ReplyAsync("```JSON\n" + dataBaseService.TempMethodForTablePrinting("companies") + "```");
+        }
     }
 }

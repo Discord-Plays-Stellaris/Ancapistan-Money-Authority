@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using Discord;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,35 @@ namespace VIR.Modules
             db.SetJObjectAsync(JSONObj, "system");
 
             await ReplyAsync("Market renamed to " + marketName + ", with the acronym of " + acronym);
+        }
+
+        [Command("market")]
+        [Alias("marketinfo")]
+        public async Task MarketInfoTask()
+        {
+            string name = await db.GetFieldAsync("MarketInfo", "marketName", "system");
+            string acronym = await db.GetFieldAsync("MarketInfo", "acronym", "system");
+
+            EmbedFieldBuilder marketNameField = new EmbedFieldBuilder().WithIsInline(false).WithName("Market Name:").WithValue(name + " (" + acronym + ")");
+            EmbedFieldBuilder marketChannelField = new EmbedFieldBuilder().WithIsInline(false).WithName("Market Channel").WithValue($"<#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");
+            Embed embd = new EmbedBuilder().WithTitle("Stock Market Info").AddField(marketNameField).AddField(marketChannelField).Build();
+
+            await ReplyAsync("", false, embd);
+        }
+
+        [Command("marketchannel")]
+        [Alias("setmarketchannel","transactionchannel","settransactionchannel")]
+        [HasMasterOfBots]
+        public async Task MarketChannelTask(string channel)
+        {
+            channel = channel.Remove(channel.Length - 1, 1);
+            channel = channel.Remove(0, 2);
+
+            StockMarketChannel channelObj = new StockMarketChannel(channel);
+            JObject JSONChannel = await db.SerializeObject<StockMarketChannel>(channelObj);
+            db.SetJObjectAsync(JSONChannel, "system");
+
+            ReplyAsync($"Market channel set to <#{channel}>");
         }
     }
 }
