@@ -18,11 +18,13 @@ namespace VIR.Modules
     {
         private readonly DataBaseHandlingService db;
         private readonly CommandHandlingService CommandService;
+        private readonly StockMarketService MarketService;
 
-        public StockMarketCommands(DataBaseHandlingService input, CommandHandlingService inputCommandService)
+        public StockMarketCommands(DataBaseHandlingService _db, CommandHandlingService _CommandService, StockMarketService _MarketService)
         {
-            db = input;
-            CommandService = inputCommandService;
+            db = _db;
+            CommandService = _CommandService;
+            MarketService = _MarketService;
         }
 
         [Command("namemarket")]
@@ -31,7 +33,7 @@ namespace VIR.Modules
         {
             StockMarketObject marketObj = new StockMarketObject(acronym, marketName);
 
-            JObject JSONObj = await db.SerializeObject<StockMarketObject>(marketObj);
+            JObject JSONObj = db.SerializeObject<StockMarketObject>(marketObj);
 
             db.SetJObjectAsync(JSONObj, "system");
 
@@ -61,13 +63,51 @@ namespace VIR.Modules
             channel = channel.Remove(0, 2);
 
             StockMarketChannel channelObj = new StockMarketChannel(channel);
-            JObject JSONChannel = await db.SerializeObject<StockMarketChannel>(channelObj);
+            JObject JSONChannel = db.SerializeObject<StockMarketChannel>(channelObj);
             db.SetJObjectAsync(JSONChannel, "system");
 
             await CommandService.PostMessageTask(channel, "This channel has been set as the transaction announcement channel!");
 
             await ReplyAsync($"Market channel set to <#{channel}>");
             
+        }
+
+        [Command("setshares")]
+        [HasMasterOfBots]
+        public async Task SetSharesTask(string user, string ticker, string amount)
+        {
+            user = user.Remove(user.Length - 1, 1);
+            user = user.Remove(0, 2);
+
+            await MarketService.SetShares(user, ticker, Convert.ToInt32(amount));
+            await ReplyAsync($"<@{user}>'s shares in {ticker} set to {amount}");
+        }
+
+        [Command("getshares")]
+        public async Task GetSharesAsync(string user, string ticker)
+        {
+            user = user.Remove(user.Length - 1, 1);
+            user = user.Remove(0, 2);
+
+            await ReplyAsync($"<@{user}> has {Convert.ToString(await MarketService.GetShares(user, ticker))} shares in {ticker}");
+        }
+
+        [Command("transaction")]
+        [HasMasterOfBots]
+        public async Task ManualTransactionAsync(string type, string ticker, int shares, double price)
+        {
+            Transaction transaction = new Transaction(price, shares, type, Context.User.Id.ToString(), ticker, db);
+
+            try
+            {
+                await db.SetJObjectAsync(db.SerializeObject<Transaction>(transaction), "transactions");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Environment.Exit(0);
+            }
+            await ReplyAsync("Manual transaction complete" + type + ticker + shares + price);
         }
     }
 }

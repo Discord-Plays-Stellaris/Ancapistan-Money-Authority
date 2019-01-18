@@ -33,7 +33,7 @@ namespace VIR.Modules
             Company company = new Company();
             company.name = name;
             company.shares = startingShares;
-            company.ticker = ticker;
+            company.id = ticker;
             company.employee = new Dictionary<string, Employee>();
             Employee employee = new Employee();
             employee.userID = Context.User.Id.ToString();

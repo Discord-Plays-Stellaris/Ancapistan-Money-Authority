@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +12,7 @@ namespace VIR.Modules.Objects.Company
     /// </summary>
     public class Company
     {
-        public string ticker;
+        public string id;
         public string name;
         public Dictionary<string, Employee> employee; //Format: userid, title
         //public Dictionary<string, int> assets; //thing, amount
@@ -19,6 +20,7 @@ namespace VIR.Modules.Objects.Company
         public int money;
         public int shares;
         public double SharePrice;
+
         public Company()
         {
             SharePrice = 0;
@@ -26,7 +28,7 @@ namespace VIR.Modules.Objects.Company
         }
         public Company(JObject companyDbEntry)
         {
-            ticker = (string)companyDbEntry["id"];
+            /*ticker = (string)companyDbEntry["id"];
             name = (string)companyDbEntry["name"];
             money = (int)companyDbEntry["money"];
             shares = (int)companyDbEntry["shares"];
@@ -35,10 +37,21 @@ namespace VIR.Modules.Objects.Company
             {
                 employee.Add((string)entry["id"], new Employee(entry));
             }
+            shareholders = JsonConvert.DeserializeObject<Dictionary<string, int>>(companyDbEntry["shareholders"].ToString());*/
+
+            Company tempObj = JsonConvert.DeserializeObject<Company>(companyDbEntry.ToString());
+
+            id = tempObj.id;
+            name = tempObj.name;
+            money = tempObj.money;
+            shares = tempObj.shares;
+            SharePrice = tempObj.SharePrice;
+            employee = tempObj.employee;
+            positions = tempObj.positions;
         }
         public JObject serializeIntoJObject()
         {
-            JObject temp = new JObject();
+            /*JObject temp = new JObject();
             temp["name"] = name;
             temp["money"] = money;
             temp["id"] = ticker;
@@ -50,7 +63,11 @@ namespace VIR.Modules.Objects.Company
                 employeeDeserialise.Add(x.Deserialise());
             }
             temp["employee"] = JArray.FromObject(employeeDeserialise.ToArray());
-            return temp;
+            return temp;*/
+
+            string JSONString = JsonConvert.SerializeObject(this);
+            JObject jObject = JObject.Parse(JSONString);
+            return jObject;
         }
     }
 }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using VIR.Services;
 
 namespace VIR.Objects
 {
@@ -64,13 +66,71 @@ namespace VIR.Objects
             ticker = (string)JSONInput["ticker"];
         }
 
-        public Transaction(double _price, int _shares, string _type, string _author, string _ticker, string marketChannel)
+        /// <summary>
+        /// The constructor for a new transaction.
+        /// </summary>
+        /// <param name="_price">The price per share</param>
+        /// <param name="_shares">The total amount of shares</param>
+        /// <param name="_type">Buy, sell, or private</param>
+        /// <param name="_author">The user who initiated the transaction</param>
+        /// <param name="_ticker">The ticker of the company who's shares are being traded</param>
+        /// <param name="db">A DataBaseHandlingService object.</param>
+        public Transaction(double _price, int _shares, string _type, string _author, string _ticker, DataBaseHandlingService db)
         {
             price = _price;
             shares = _shares;
             type = _type;
             author = _author;
             ticker = _ticker;
+
+        }
+
+        private async Task Save(DataBaseHandlingService db)
+        {
+            await db.SetJObjectAsync(db.SerializeObject<Transaction>(this), "transactions");
+            Console.Write("");
+        }
+    }
+
+    public class UsersWithShares
+    {
+        public string id = "UsersWithShares";
+        public List<string> UserList = new List<string>();
+
+        public UsersWithShares()
+        {
+            // code
+        }
+
+        public UsersWithShares(JObject input)
+        {
+            UsersWithShares tempObj = JsonConvert.DeserializeObject<UsersWithShares>(input.ToString());
+
+            id = tempObj.id;
+            UserList = tempObj.UserList;
+        }
+    }
+
+    public class UserShares
+    {
+        public string id;
+        public Dictionary<string, int> ownedShares = new Dictionary<string, int>(); // Format: Ticker, Shares
+
+        public UserShares()
+        {
+        }
+
+        public UserShares(string userID)
+        {
+            id = userID;
+        }
+
+        public UserShares(JObject input, bool isJSON)
+        {
+            UserShares tempObj = JsonConvert.DeserializeObject<UserShares>(input.ToString());
+
+            id = tempObj.id;
+            ownedShares = tempObj.ownedShares;
         }
     }
 }

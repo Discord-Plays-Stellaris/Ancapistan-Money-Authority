@@ -55,6 +55,7 @@ namespace VIR
                 .AddSingleton<DataBaseHandlingService>() //Database Handling Service, manipulates rDB data
                 .AddSingleton<AgeService>() //Age Service, sort of a wrapper for Database Handling Service
                 .AddSingleton<CompanyService>()
+                .AddSingleton<StockMarketService>() // Methods and shit for the Stock Market. #bestservice
                 .BuildServiceProvider();
         }
     }

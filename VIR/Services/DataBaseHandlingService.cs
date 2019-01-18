@@ -117,7 +117,7 @@ namespace VIR.Services
         /// <typeparam name="T">The type of the input object.</typeparam>
         /// <param name="input">The input object</param>
         /// <returns>A JObject</returns>
-        public async Task<JObject> SerializeObject<T>(T input)
+        public JObject SerializeObject<T>(T input)
         {
             string JSONString = JsonConvert.SerializeObject(input);
             JObject jObject = JObject.Parse(JSONString);
