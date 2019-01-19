@@ -105,6 +105,7 @@ namespace VIR.Modules
         }
 
         [Command("add")]
+        [Alias("modify")]
         [HasMasterOfBots]
         [IsInDPSGuild]
         public async Task AddAsync([Summary("Field to get")] string field, [Summary("User")] IUser user, [Summary("Value to add")] int value)
@@ -120,7 +121,7 @@ namespace VIR.Modules
                 val = int.Parse(x);
             }
             await DataBaseHandlingService.SetFieldAsync(user.Id.ToString(), field, value + val, "users");
-            await ReplyAsync($"{field} value set to {value}");
+            await ReplyAsync($"{field} value modified by {value}");
         }
 
         [Command("advance")]

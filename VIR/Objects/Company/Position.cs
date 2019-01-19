@@ -7,10 +7,18 @@ namespace VIR.Modules.Objects.Company
 {
     public class Position
     {
+        /*
+         * Level code explanation
+         * 99 is max, 1 is min, determines whether or not a role can edit another role
+         * Manages code explanation
+         * If the role can manage other roles, add 2
+         * If the role can read permissions, add 4
+         * If the role can execute administrative commands, add 1
+         */
         public string ID;
         public int level;
         public string name;
-        public Collection<Position> manages;
+        public int manages;
         public Position()
         {
              
@@ -20,10 +28,7 @@ namespace VIR.Modules.Objects.Company
             ID = (string)obj["id"];
             level = (int)obj["level"];
             name = (string)obj["name"];
-            foreach(JObject entry in (Array)obj["manages"])
-            {
-                manages.Add(new Position(entry));
-            }
+            manages = (int)obj["manages"];
         }
         public JObject Deserialise()
         {
@@ -31,12 +36,7 @@ namespace VIR.Modules.Objects.Company
             obj["id"] = ID;
             obj["level"] = level;
             obj["name"] = name;
-            Collection<JObject> managesDeserialise = new Collection<JObject>();
-            foreach(Position x in manages)
-            {
-                managesDeserialise.Add(x.Deserialise());
-            }
-            obj["manages"] = JArray.FromObject(managesDeserialise.ToArray());
+            obj["manages"] = manages;
             return obj;
         }
     }

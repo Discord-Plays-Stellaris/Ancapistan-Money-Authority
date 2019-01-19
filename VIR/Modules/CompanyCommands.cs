@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ namespace VIR.Modules
             company.shares = startingShares;
             company.id = ticker;
             company.employee = new Dictionary<string, Employee>();
+            company.positions = new Dictionary<string, Position>();
             Employee employee = new Employee();
             employee.userID = Context.User.Id.ToString();
             employee.salary = 0;
@@ -43,10 +45,11 @@ namespace VIR.Modules
             Position position = new Position();
             position.ID = "CEO";
             position.level = 99;
-            position.manages = new Collection<Position>();
+            position.manages = 7;
             position.name = "CEO";
             employee.position = position;
             company.employee.Add(Context.User.Id.ToString(), employee);
+            company.positions.Add(position.ID, position);
             await CompanyService.setCompany(company);
             JObject user = await dataBaseService.getJObjectAsync(Context.User.Id.ToString(), "users");
             Collection<string> corps = new Collection<string>();
@@ -72,6 +75,30 @@ namespace VIR.Modules
                 tmp += (string)x["id"] + " - " + (string)x["name"] + "\n";
             }
             await ReplyAsync($"Current Companies:\n{tmp}");
+        }
+
+        [Command("addposition")]
+        public async Task AddPositionToPlayer(IUser user, string companyTicker, string positionID)
+        {
+            Company company = await CompanyService.getCompany(companyTicker);
+            if (!company.employee.ContainsKey(Context.User.Id.ToString()))
+                await ReplyAsync("You are not part of this corporation!");
+            if (company.employee[Context.User.Id.ToString()].position.manages%2 == 1) 
+            {
+                if(!company.employee.ContainsKey(user.Id.ToString()))
+                {
+                    await ReplyAsync("The User specified is not a part of this corporation!");
+                } else
+                {
+                    if (company.positions.ContainsKey(positionID)) {
+                        company.employee[user.Id.ToString()].position = company.positions[positionID];
+                        await ReplyAsync($"Successfully changed {user.Mention} to position of {company.positions[positionID].name}");
+                    } else
+                    {
+                        await ReplyAsync("The position id you specified is invalid.");
+                    }
+                }
+            }
         }
     }
 }
