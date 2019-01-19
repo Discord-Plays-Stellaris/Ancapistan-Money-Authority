@@ -318,7 +318,7 @@ namespace VIR.Modules
 
             foreach(string ticker in ownedShares.Keys)
             {
-                EmbedFieldBuilder embedField = new EmbedFieldBuilder().WithIsInline(true).WithName($"{(string)await db.GetFieldAsync(ticker, "name", "companies")} ({ticker})").WithValue(ownedShares[ticker]);
+                EmbedFieldBuilder embedField = new EmbedFieldBuilder().WithIsInline(false).WithName($"{(string)await db.GetFieldAsync(ticker, "name", "companies")} ({ticker}) ").WithValue(ownedShares[ticker]);
                 embedFields.Add(embedField);
             }
 

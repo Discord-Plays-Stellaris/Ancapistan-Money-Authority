@@ -19,11 +19,13 @@ namespace VIR.Modules
     {
         private readonly CompanyService CompanyService;
         private readonly DataBaseHandlingService dataBaseService;
+        private readonly CommandHandlingService CommandService;
 
-        public CompanyCommands(CompanyService com, DataBaseHandlingService db)
+        public CompanyCommands(CompanyService com, DataBaseHandlingService db, CommandHandlingService comm)
         {
             CompanyService = com;
             dataBaseService = db;
+            CommandService = comm;
         }
 
         [Command("createcompany")]
@@ -78,14 +80,25 @@ namespace VIR.Modules
 
             Collection<string> ids = await dataBaseService.getIDs("companies");
             int companyCount = ids.Count;
-            Collection<EmbedFieldBuilder> companyEmbedList;
+            Collection<EmbedFieldBuilder> companyEmbedList = new Collection<EmbedFieldBuilder>();
 
             foreach(string ID in ids)
             {
                 Company temp = new Company(await dataBaseService.getJObjectAsync(ID, "companies"));
 
-                EmbedFieldBuilder tempEmb = new EmbedFieldBuilder().WithIsInline(true).WithName($"{temp.name} ({temp.id})").WithValue("");
+                EmbedFieldBuilder tempEmb = new EmbedFieldBuilder().WithIsInline(true).WithName($"{temp.name} ({temp.id})").WithValue($"Share Price: {temp.SharePrice}. Total Value: {temp.SharePrice * temp.shares}. Amount of Shares: {temp.shares}");
+
+                companyEmbedList.Add(tempEmb);
             }
+
+            EmbedBuilder embed = new EmbedBuilder().WithColor(Color.Gold).WithTitle("Companies").WithDescription("This is a list of all companies").WithFooter($"Total amount of companies: {companyCount}");
+
+            foreach(EmbedFieldBuilder field in companyEmbedList)
+            {
+                embed.AddField(field);
+            }
+
+            await CommandService.PostEmbedTask(Context.Channel.Id.ToString(), embed.Build());
         }
 
         [Command("addposition")]
