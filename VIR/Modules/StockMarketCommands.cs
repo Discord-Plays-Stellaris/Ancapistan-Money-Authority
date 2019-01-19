@@ -96,20 +96,192 @@ namespace VIR.Modules
         [HasMasterOfBots]
         public async Task ManualTransactionAsync(string type, string ticker, int shares, double price)
         {
-            Transaction transaction = new Transaction(price, shares, type, Context.User.Id.ToString(), ticker, db);
+            Transaction transaction = new Transaction(price, shares, type, Context.User.Id.ToString(), ticker, db, CommandService);
 
             try
             {
+                Guid GUID = Guid.NewGuid();
+                transaction.id = GUID;
                 JObject tmp = db.SerializeObject(transaction);
-                tmp["id"] = Guid.NewGuid();
                 await db.SetJObjectAsync(tmp, "transactions");
+                await ReplyAsync($"Manual transaction lodged in <#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");
             }
             catch (Exception e)
             {
                 await Log.Logger(Log.Logs.ERROR, e.Message);
                 await ReplyAsync("Something went wrong: " + e.Message);
             }
-            await ReplyAsync("Manual transaction complete");
+        }
+
+        [Command("accept")]
+        [Alias("acceptoffer")]
+        public async Task AcceptOfferAsync(string offerID)
+        {
+            Collection<string> IDs = await db.getIDs("transactions");
+            string userMoneyt;
+            string authorMoneyt;
+            double userMoney;
+            double authorMoney;
+
+            if (IDs.Contains(offerID) == true)
+            {
+                Transaction transaction = new Transaction(await db.getJObjectAsync(offerID, "transactions"));
+
+                if (transaction.author != Context.User.Id.ToString())
+                {
+                    // Gets money values of the command user and the transaction author
+                    userMoneyt = (string)await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
+                    if (userMoneyt == null)
+                    {
+                        userMoney = 50000;
+                    }
+                    else
+                    {
+                        userMoney = double.Parse(userMoneyt);
+                    }
+
+                    authorMoneyt = (string)await db.GetFieldAsync(transaction.author, "money", "users");
+                    if (authorMoneyt == null)
+                    {
+                        authorMoney = 50000;
+                    }
+                    else
+                    {
+                        authorMoney = double.Parse(authorMoneyt);
+                    }
+
+                    // Transfers the money
+                    if (transaction.type == "buy")
+                    {
+                        userMoney += (transaction.shares * transaction.price);
+                        authorMoney -= (transaction.shares * transaction.price);
+                    }
+                    else
+                    {
+                        userMoney -= (transaction.shares * transaction.price);
+                        authorMoney += (transaction.shares * transaction.price);
+                    }
+
+                    // Transfers the shares
+                    int _userShares = await MarketService.GetShares(Context.User.Id.ToString(), transaction.ticker);
+                    int _authorShares = await MarketService.GetShares(transaction.author, transaction.ticker);
+
+                    if (transaction.type == "buy")
+                    {
+                        _authorShares += transaction.shares;
+                        _userShares -= transaction.shares;
+                    }
+                    else
+                    {
+                        _authorShares -= transaction.shares;
+                        _userShares += transaction.shares;
+                    }
+
+                    if (_userShares < 0)
+                    {
+                        await ReplyAsync("You cannot complete this transaction as it would leave you with a negative amount of shares in the specified company.");
+                    }
+                    else if (userMoney < 0)
+                    {
+                        await ReplyAsync("You cannot complete this transaction as it would leave you with a negative amount on money.");
+                    }
+                    else
+                    {
+                        await MarketService.SetShares(Context.User.Id.ToString(), transaction.ticker, _userShares);
+                        await MarketService.SetShares(transaction.author, transaction.ticker, _authorShares);
+                        await MarketService.UpdateSharePrice(transaction);
+
+                        await db.SetFieldAsync<double>(Context.User.Id.ToString(), "money", userMoney, "users");
+                        await db.SetFieldAsync<double>(transaction.author, "money", authorMoney, "users");
+                        await db.RemoveObjectAsync(offerID, "transactions");
+
+                        await ReplyAsync("Transaction complete!");
+                        await CommandService.PostMessageTask((string)await db.GetFieldAsync("MarketChannel", "channel", "system"), $"<@{transaction.author}>'s Transaction with ID {transaction.id} has been accepted by <@{Context.User.Id}>!");
+                        //await transaction.authorObj.SendMessageAsync($"Your transaction with the id {transaction.id} has been completed by {Context.User.Username.ToString()}");
+                    }
+                }
+                else
+                {
+                    await ReplyAsync("You cannot accept your own transaction!");
+                }
+            }
+            else
+            {
+                await ReplyAsync("That is not a valid transaction ID");
+            }
+        }
+
+        [Command("buyoffer")]
+        public async Task SellOfferAsync(string ticker, int shares, double price)
+        {
+            string AuthorMoneyt = (string) await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
+            double AuthorMoney;
+
+            if (AuthorMoneyt == null)
+            {
+                AuthorMoney = 50000;
+                await db.SetFieldAsync<double>(Context.User.Id.ToString(), "money", AuthorMoney, "users");
+            }
+            else
+            {
+                AuthorMoney = double.Parse(AuthorMoneyt);
+            }
+
+            if ((shares * price) > AuthorMoney)
+            {
+                await ReplyAsync("You do not have enough money for this transaction");
+            }
+            else
+            {
+                Transaction transaction = new Transaction(price, shares, "buy", Context.User.Id.ToString(), ticker, db, CommandService);
+
+                try
+                {
+                    Guid GUID = Guid.NewGuid();
+                    transaction.id = GUID;
+                    JObject tmp = db.SerializeObject(transaction);
+                    await db.SetJObjectAsync(tmp, "transactions");
+                    await ReplyAsync($"Buy offer lodged in <#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");
+                }
+                catch (Exception e)
+                {
+                    await Log.Logger(Log.Logs.ERROR, e.Message);
+                    await ReplyAsync("Something went wrong: " + e.Message);
+                }
+            }
+        }
+
+        [Command("selloffer")]
+        public async Task BuyOfferAsync(string ticker, int shares, double price)
+        {
+            string AuthorMoneyt = (string)await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
+            double AuthorMoney;
+
+            if (AuthorMoneyt == null)
+            {
+                AuthorMoney = 50000;
+                await db.SetFieldAsync<double>(Context.User.Id.ToString(), "money", AuthorMoney, "users");
+            }
+            else
+            {
+                AuthorMoney = double.Parse(AuthorMoneyt);
+            }
+
+            Transaction transaction = new Transaction(price, shares, "sell", Context.User.Id.ToString(), ticker, db, CommandService);
+
+            try
+            {
+                Guid GUID = Guid.NewGuid();
+                transaction.id = GUID;
+                JObject tmp = db.SerializeObject(transaction);
+                await db.SetJObjectAsync(tmp, "transactions");
+                await ReplyAsync($"Sell offer lodged in <#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");
+            }
+            catch (Exception e)
+            {
+                await Log.Logger(Log.Logs.ERROR, e.Message);
+                await ReplyAsync("Something went wrong: " + e.Message);
+            }
         }
     }
 }

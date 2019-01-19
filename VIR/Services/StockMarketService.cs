@@ -68,15 +68,13 @@ namespace VIR.Services
 
         public async Task UpdateSharePrice(Transaction transaction)
         {
-            string _ticker = transaction.ticker;
-            Company company = new Company(await db.getJObjectAsync(_ticker, "companies"));
+            Company company = new Company(await db.getJObjectAsync(transaction.ticker, "companies"));
 
-            double newPrice = (transaction.shares / company.shares) * (transaction.price - company.SharePrice) + company.SharePrice;
+            double newPrice = (((transaction.shares / company.shares) * (transaction.price - company.SharePrice)) + company.SharePrice);
 
             company.SharePrice = newPrice;
-            await db.SetJObjectAsync(db.SerializeObject<Company>(company), "companies");
+            Console.WriteLine((((transaction.shares / company.shares) * (transaction.price - company.SharePrice)) + company.SharePrice));
+            await db.SetFieldAsync(transaction.ticker, "SharePrice", company.SharePrice, "companies");
         }
-
-
     }
 }

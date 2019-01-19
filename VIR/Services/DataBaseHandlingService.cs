@@ -114,6 +114,17 @@ namespace VIR.Services
         }
 
         /// <summary>
+        /// Removes a document from the DB
+        /// </summary>
+        /// <param name="id">The ID of the document</param>
+        /// <param name="table">The table of the document</param>
+        /// <returns></returns>
+        public async Task RemoveObjectAsync(string id, string table)
+        {
+            await r.Db("root").Table(table).Get(id).Delete().RunAsync(conn);
+        }
+
+        /// <summary>
         /// Gets a JObject from the database.
         /// </summary>
         /// <param name="id">The ID of the document</param>

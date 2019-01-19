@@ -25,23 +25,39 @@ namespace VIR.Modules
         {
             string aget;
             int age;
+            string moneyt;
+            double money;
             if (user == null)
             {
                 user = user ?? Context.User;
                 aget = (string) await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), "age", "users");
+                moneyt = (string) await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), "money", "users");
+
                 if (aget == null)
                 {
                     Random rand = new Random(); //Set up a RNG
                     age = rand.Next(20, 25); //Get num between 20 and 25
-                    await DataBaseHandlingService.SetFieldAsync(user.Id.ToString(), "age", age, "users");
+                    await DataBaseHandlingService.SetFieldAsync<int>(user.Id.ToString(), "age", age, "users");
                 }
                 else
                 {
                     age = int.Parse(aget);
                 }
+
+                if (moneyt == null)
+                {
+                    money = 50000;
+                    await DataBaseHandlingService.SetFieldAsync<double>(user.Id.ToString(), "money", money, "users");
+                }
+                else
+                {
+                    money = double.Parse(moneyt);
+                }
+
                 string PPt;
                 int pp;
                 PPt = (string) await DataBaseHandlingService.GetFieldAsync(user.Id.ToString(), "pp", "users");
+
                 if(PPt == null) {
                     pp = 0;
                     await DataBaseHandlingService.SetFieldAsync(user.Id.ToString(), "pp", pp, "users");
@@ -49,8 +65,11 @@ namespace VIR.Modules
                 {
                     pp = int.Parse(PPt);
                 }
+
                 EmbedFieldBuilder ppField = new EmbedFieldBuilder().WithIsInline(false).WithName("PP:").WithValue(pp.ToString());
-                Embed embedd = new EmbedBuilder().WithImageUrl(Context.User.GetAvatarUrl()).WithFooter("Brought to you by Ohcitrade").WithTitle($"Inventory of {Context.User.Username}").WithDescription($"Age: {age.ToString()}").AddField(ppField).Build();
+                EmbedFieldBuilder moneyField = new EmbedFieldBuilder().WithIsInline(false).WithName("Money:").WithValue($"${money.ToString()}");
+                Embed embedd = new EmbedBuilder().WithImageUrl(Context.User.GetAvatarUrl()).WithFooter("Brought to you by Ohcitrade").WithTitle($"Inventory of {Context.User.Username}").WithDescription($"Age: {age.ToString()}").AddField(ppField).AddField(moneyField).Build();
+
                 await user.SendMessageAsync("", false, embedd);
                 await ReplyAsync("Your balance was sent to you privately.");
                 return;
