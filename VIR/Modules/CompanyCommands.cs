@@ -19,6 +19,7 @@ namespace VIR.Modules
     {
         private readonly CompanyService CompanyService;
         private readonly DataBaseHandlingService dataBaseService;
+        private readonly CommandHandlingService CommandService;
         public readonly List<int> r = new List<int> { 4, 5, 6, 7 };
         public readonly List<int> w = new List<int> { 2, 3, 6, 7 };
         public readonly List<int> e = new List<int> { 1, 3, 5, 7 };
