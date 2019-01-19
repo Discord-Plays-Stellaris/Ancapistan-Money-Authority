@@ -68,13 +68,24 @@ namespace VIR.Modules
         [Alias("corporations")]
         public async Task GetCompaniesTask()
         {
-            string tmp = "";
+            /*string tmp = "";
             Collection<JObject> ids = await dataBaseService.getJObjects("companies");
             foreach(JObject x in ids)
             {
                 tmp += (string)x["id"] + " - " + (string)x["name"] + "\n";
             }
-            await ReplyAsync($"Current Companies:\n{tmp}");
+            await ReplyAsync($"Current Companies:\n{tmp}");*/
+
+            Collection<string> ids = await dataBaseService.getIDs("companies");
+            int companyCount = ids.Count;
+            Collection<EmbedFieldBuilder> companyEmbedList;
+
+            foreach(string ID in ids)
+            {
+                Company temp = new Company(await dataBaseService.getJObjectAsync(ID, "companies"));
+
+                EmbedFieldBuilder tempEmb = new EmbedFieldBuilder().WithIsInline(true).WithName($"{temp.name} ({temp.id})").WithValue("");
+            }
         }
 
         [Command("addposition")]

@@ -70,7 +70,12 @@ namespace VIR.Services
         {
             Company company = new Company(await db.getJObjectAsync(transaction.ticker, "companies"));
 
-            double newPrice = (transaction.shares / company.shares * (transaction.price - company.SharePrice)) + company.SharePrice;
+            double firstDiv = transaction.shares / company.shares;
+            double firstSubtract = transaction.price - company.SharePrice;
+            double firstMulti = firstDiv * firstSubtract;
+            double firstAdd = firstMulti + company.SharePrice;
+
+            double newPrice = firstAdd;
 
             company.SharePrice = newPrice;
             await db.SetFieldAsync(transaction.ticker, "SharePrice", company.SharePrice, "companies");
