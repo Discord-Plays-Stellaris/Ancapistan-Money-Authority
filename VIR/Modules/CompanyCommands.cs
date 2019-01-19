@@ -66,10 +66,10 @@ namespace VIR.Modules
         public async Task GetCompaniesTask()
         {
             string tmp = "";
-            Collection<string> ids = await dataBaseService.getIDs("companies");
-            foreach(string x in ids)
+            Collection<JObject> ids = await dataBaseService.getJObjects("companies");
+            foreach(JObject x in ids)
             {
-                tmp += ids + "\n";
+                tmp += (string)x["id"] + " - " + (string)x["name"] + "\n";
             }
             await ReplyAsync($"Current Companies:\n{tmp}");
         }

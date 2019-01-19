@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using VIR.Properties;
 using Newtonsoft.Json;
-using System.Collections.ObjectModel;
 
 namespace VIR.Services
 {
@@ -149,7 +148,22 @@ namespace VIR.Services
             Cursor<JObject> allEntries = await r.Db("root").Table(tableName).RunAsync<JObject>(conn);
             foreach(JObject x in allEntries)
             {
-                ids.Add((string) x["id"]);
+                ids.Add((string)x["id"]);
+            }
+            return ids;
+        }
+        /// <summary>
+        /// Returns all the JObjects in a table in an array
+        /// </summary>
+        /// <param name="tableName">The table to get JObjects from</param>
+        /// <returns>A collection with all of the JObjects</returns>
+        public async Task<Collection<JObject>> getJObjects(string tableName)
+        {
+            Collection<JObject> ids = new Collection<JObject>();
+            Cursor<JObject> allEntries = await r.Db("root").Table(tableName).RunAsync<JObject>(conn);
+            foreach (JObject x in allEntries)
+            {
+                ids.Add(x);
             }
             return ids;
         }

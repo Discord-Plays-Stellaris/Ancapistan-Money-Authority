@@ -35,7 +35,7 @@ namespace VIR.Modules
 
             JObject JSONObj = db.SerializeObject<StockMarketObject>(marketObj);
 
-            db.SetJObjectAsync(JSONObj, "system");
+            await db.SetJObjectAsync(JSONObj, "system");
 
             await ReplyAsync("Market renamed to " + marketName + ", with the acronym of " + acronym);
         }
@@ -64,7 +64,7 @@ namespace VIR.Modules
 
             StockMarketChannel channelObj = new StockMarketChannel(channel);
             JObject JSONChannel = db.SerializeObject<StockMarketChannel>(channelObj);
-            db.SetJObjectAsync(JSONChannel, "system");
+            await db.SetJObjectAsync(JSONChannel, "system");
 
             await CommandService.PostMessageTask(channel, "This channel has been set as the transaction announcement channel!");
 
