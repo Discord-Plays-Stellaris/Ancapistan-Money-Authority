@@ -23,10 +23,11 @@ namespace VIR.Modules
         public readonly List<int> w = new List<int> { 2, 3, 6, 7 };
         public readonly List<int> e = new List<int> { 1, 3, 5, 7 };
 
-        public CompanyCommands(CompanyService com, DataBaseHandlingService db)
+        public CompanyCommands(CompanyService com, DataBaseHandlingService db, CommandHandlingService comm)
         {
             CompanyService = com;
             dataBaseService = db;
+            CommandService = comm;
         }
 
         [Command("createcompany")]
@@ -71,13 +72,35 @@ namespace VIR.Modules
         [Alias("corporations")]
         public async Task GetCompaniesTask()
         {
-            string tmp = "";
+            /*string tmp = "";
             Collection<JObject> ids = await dataBaseService.getJObjects("companies");
             foreach(JObject x in ids)
             {
                 tmp += (string)x["id"] + " - " + (string)x["name"] + "\n";
             }
-            await ReplyAsync($"Current Companies:\n{tmp}");
+            await ReplyAsync($"Current Companies:\n{tmp}");*/
+
+            Collection<string> ids = await dataBaseService.getIDs("companies");
+            int companyCount = ids.Count;
+            Collection<EmbedFieldBuilder> companyEmbedList = new Collection<EmbedFieldBuilder>();
+
+            foreach(string ID in ids)
+            {
+                Company temp = new Company(await dataBaseService.getJObjectAsync(ID, "companies"));
+
+                EmbedFieldBuilder tempEmb = new EmbedFieldBuilder().WithIsInline(true).WithName($"{temp.name} ({temp.id})").WithValue($"Share Price: ${temp.SharePrice}. Total Value: ${temp.SharePrice * temp.shares}. Amount of Shares: {temp.shares}");
+
+                companyEmbedList.Add(tempEmb);
+            }
+
+            EmbedBuilder embed = new EmbedBuilder().WithColor(Color.Gold).WithTitle("Companies").WithDescription("This is a list of all companies").WithFooter($"Total amount of companies: {companyCount}");
+
+            foreach(EmbedFieldBuilder field in companyEmbedList)
+            {
+                embed.AddField(field);
+            }
+
+            await CommandService.PostEmbedTask(Context.Channel.Id.ToString(), embed.Build());
         }
 
         [Command("addposition")]
@@ -101,6 +124,25 @@ namespace VIR.Modules
                         await ReplyAsync("The position id you specified is invalid.");
                     }
                 }
+            }
+        }
+
+        [Command("deletecompany")]
+        [Alias("deletecorporation","removecorporation","removecompany")]
+        [HasMasterOfBots]
+        public async Task RemoveCorpAsync(string ticker)
+        {
+            Collection<string> tickers;
+            tickers = await dataBaseService.getIDs("companies");
+
+            if (!tickers.Contains(ticker))
+            {
+                await ReplyAsync("That company does not exist");
+            }
+            else
+            {
+                await dataBaseService.RemoveObjectAsync(ticker, "companies");
+                await ReplyAsync("Company deleted");
             }
         }
 

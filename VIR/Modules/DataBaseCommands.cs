@@ -68,7 +68,7 @@ namespace VIR.Modules
 
                 EmbedFieldBuilder ppField = new EmbedFieldBuilder().WithIsInline(false).WithName("PP:").WithValue(pp.ToString());
                 EmbedFieldBuilder moneyField = new EmbedFieldBuilder().WithIsInline(false).WithName("Money:").WithValue($"${money.ToString()}");
-                Embed embedd = new EmbedBuilder().WithImageUrl(Context.User.GetAvatarUrl()).WithFooter("Brought to you by Ohcitrade").WithTitle($"Inventory of {Context.User.Username}").WithDescription($"Age: {age.ToString()}").AddField(ppField).AddField(moneyField).Build();
+                Embed embedd = new EmbedBuilder().WithImageUrl(Context.User.GetAvatarUrl()).WithFooter($"User ID: {Context.User.Id.ToString()}").WithTitle($"Inventory of {Context.User.Username}").WithDescription($"Age: {age.ToString()}").AddField(ppField).AddField(moneyField).WithColor(Color.Green).Build();
 
                 await user.SendMessageAsync("", false, embedd);
                 await ReplyAsync("Your balance was sent to you privately.");

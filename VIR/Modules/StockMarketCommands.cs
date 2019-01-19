@@ -269,21 +269,68 @@ namespace VIR.Modules
                 AuthorMoney = double.Parse(AuthorMoneyt);
             }
 
-            Transaction transaction = new Transaction(price, shares, "sell", Context.User.Id.ToString(), ticker, db, CommandService);
+            UserShares tempObj = new UserShares(await db.getJObjectAsync(Context.User.Id.ToString(), "shares"), true);
+            Dictionary<string, int> ownedShares = tempObj.ownedShares;
 
+            int outcomeAmount = ownedShares[ticker] - shares;
+
+            if (outcomeAmount < 0)
+            {
+                await ReplyAsync("You cannot complete this transaction as it would leave you with a negative amount of shares in the specified company.");
+            }
+            else
+            {
+                Transaction transaction = new Transaction(price, shares, "sell", Context.User.Id.ToString(), ticker, db, CommandService);
+
+                try
+                {
+                    Guid GUID = Guid.NewGuid();
+                    transaction.id = GUID;
+                    JObject tmp = db.SerializeObject(transaction);
+                    await db.SetJObjectAsync(tmp, "transactions");
+                    await ReplyAsync($"Sell offer lodged in <#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");
+                }
+                catch (Exception e)
+                {
+                    await Log.Logger(Log.Logs.ERROR, e.Message);
+                    await ReplyAsync("Something went wrong: " + e.Message);
+                }
+            }
+        }
+
+        [Command("shares")]
+        public async Task SharesAsync()
+        {
+            UserShares sharesObj;
             try
             {
-                Guid GUID = Guid.NewGuid();
-                transaction.id = GUID;
-                JObject tmp = db.SerializeObject(transaction);
-                await db.SetJObjectAsync(tmp, "transactions");
-                await ReplyAsync($"Sell offer lodged in <#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");
+                sharesObj = new UserShares(await db.getJObjectAsync(Context.User.Id.ToString(), "shares"), true);
             }
-            catch (Exception e)
+            catch (System.NullReferenceException)
             {
-                await Log.Logger(Log.Logs.ERROR, e.Message);
-                await ReplyAsync("Something went wrong: " + e.Message);
+                await ReplyAsync("You shares have been sent to you privately");
+                await Context.User.SendMessageAsync("You do not own any shares");
+                return;
             }
+            Dictionary<string, int> ownedShares = sharesObj.ownedShares;
+
+            Collection<EmbedFieldBuilder> embedFields = new Collection<EmbedFieldBuilder>();
+
+            foreach(string ticker in ownedShares.Keys)
+            {
+                EmbedFieldBuilder embedField = new EmbedFieldBuilder().WithIsInline(false).WithName($"{(string)await db.GetFieldAsync(ticker, "name", "companies")} ({ticker}) ").WithValue(ownedShares[ticker]);
+                embedFields.Add(embedField);
+            }
+
+            EmbedBuilder embed = new EmbedBuilder().WithColor(Color.Gold).WithTitle($"Shares Owned by {Context.User.Username.ToString()}").WithDescription($"This is a list of all shares owned by {Context.User.Username.ToString()}");
+
+            foreach(EmbedFieldBuilder field in embedFields)
+            {
+                embed.AddField(field);
+            }
+
+            await ReplyAsync("You shares have been sent to you privately");
+            await Context.User.SendMessageAsync("", false, embed.Build());
         }
     }
 }
