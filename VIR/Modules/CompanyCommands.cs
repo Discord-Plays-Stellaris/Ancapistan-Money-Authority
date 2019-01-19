@@ -19,6 +19,9 @@ namespace VIR.Modules
     {
         private readonly CompanyService CompanyService;
         private readonly DataBaseHandlingService dataBaseService;
+        public readonly List<int> r = new List<int> { 4, 5, 6, 7 };
+        public readonly List<int> w = new List<int> { 2, 3, 6, 7 };
+        public readonly List<int> e = new List<int> { 1, 3, 5, 7 };
 
         public CompanyCommands(CompanyService com, DataBaseHandlingService db)
         {
@@ -83,7 +86,7 @@ namespace VIR.Modules
             Company company = await CompanyService.getCompany(companyTicker);
             if (!company.employee.ContainsKey(Context.User.Id.ToString()))
                 await ReplyAsync("You are not part of this corporation!");
-            if (company.employee[Context.User.Id.ToString()].position.manages%2 == 1) 
+            if (e.Contains(company.employee[Context.User.Id.ToString()].position.manages)) 
             {
                 if(!company.employee.ContainsKey(user.Id.ToString()))
                 {
@@ -99,6 +102,24 @@ namespace VIR.Modules
                     }
                 }
             }
+        }
+
+        [Command("createPosition")]
+        public async Task createPosition(string ticker, string positionID, int level, int manages, [Remainder] string name)
+        {
+            Company company = await CompanyService.getCompany(ticker);
+            if (!company.employee.ContainsKey(Context.User.Id.ToString()))
+                await ReplyAsync($"You are not an employee in {company.name}");
+            if (w.Contains(company.employee[Context.User.Id.ToString()].position.manages))
+                await ReplyAsync("You do not have the permission to make/manage positions.");
+            if (manages > 7 || manages < 0)
+                await ReplyAsync("Manages must be in range of 0 to 7.");
+            Position pos = new Position();
+            pos.ID = positionID;
+            pos.level = level;
+            pos.manages = manages;
+            pos.name = name;
+            company.positions.Add(positionID, pos);
         }
     }
 }
