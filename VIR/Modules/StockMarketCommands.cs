@@ -269,14 +269,35 @@ namespace VIR.Modules
                 AuthorMoney = double.Parse(AuthorMoneyt);
             }
 
-            UserShares tempObj = new UserShares(await db.getJObjectAsync(Context.User.Id.ToString(), "shares"), true);
+            UserShares tempObj;
+
+            try
+            {
+                tempObj = new UserShares(await db.getJObjectAsync(Context.User.Id.ToString(), "shares"), true);
+            }
+            catch (System.NullReferenceException)
+            {
+                tempObj = new UserShares(Context.User.Id.ToString());
+                await ReplyAsync("You cannot complete this transaction as you own no shares in the specified company");
+                return;
+            }
             Dictionary<string, int> ownedShares = tempObj.ownedShares;
+
+            if (ownedShares.ContainsKey(ticker) == false)
+            {
+                await ReplyAsync("You cannot complete this transaction as you own no shares in the specified company");
+                return;
+            }
 
             int outcomeAmount = ownedShares[ticker] - shares;
 
             if (outcomeAmount < 0)
             {
                 await ReplyAsync("You cannot complete this transaction as it would leave you with a negative amount of shares in the specified company.");
+            }
+            else if (ownedShares[ticker] == 0)
+            {
+                await ReplyAsync("You cannot complete this transaction as you own no shares in the specified company.");
             }
             else
             {
@@ -329,7 +350,7 @@ namespace VIR.Modules
                 embed.AddField(field);
             }
 
-            await ReplyAsync("You shares have been sent to you privately");
+            await ReplyAsync("Your shares have been sent to you privately");
             await Context.User.SendMessageAsync("", false, embed.Build());
         }
     }

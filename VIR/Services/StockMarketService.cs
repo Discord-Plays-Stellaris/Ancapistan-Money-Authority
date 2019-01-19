@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using VIR.Services;
 using VIR.Objects;
@@ -74,6 +75,30 @@ namespace VIR.Services
 
             company.SharePrice = newPrice;
             await db.SetFieldAsync(transaction.ticker, "SharePrice", company.SharePrice, "companies");
+        }
+
+        public async Task<int> CorpShares(string ticker)
+        {
+            Company company = new Company(await db.getJObjectAsync(ticker, "companies"));
+            Collection<string> shareholders = await db.getIDs("shares");
+            Dictionary<string, int> ownedShares;
+            int shares = 0;
+
+            foreach(string ID in shareholders)
+            {
+                UserShares userShares = new UserShares(await db.getJObjectAsync(ID, "shares"), true);
+                ownedShares = userShares.ownedShares;
+
+                if (ownedShares.ContainsKey(ticker))
+                {
+                    shares += ownedShares[ticker];
+                }
+            }
+
+            company.shares = shares;
+            await db.SetJObjectAsync(db.SerializeObject<Company>(company), "companies");
+
+            return shares;
         }
     }
 }

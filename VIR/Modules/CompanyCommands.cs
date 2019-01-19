@@ -21,25 +21,27 @@ namespace VIR.Modules
         private readonly CompanyService CompanyService;
         private readonly DataBaseHandlingService dataBaseService;
         private readonly CommandHandlingService CommandService;
+        private readonly StockMarketService MarketService;
         public readonly List<int> r = new List<int> { 4, 5, 6, 7 };
         public readonly List<int> w = new List<int> { 2, 3, 6, 7 };
         public readonly List<int> e = new List<int> { 1, 3, 5, 7 };
 
-        public CompanyCommands(CompanyService com, DataBaseHandlingService db, CommandHandlingService comm)
+        public CompanyCommands(CompanyService com, DataBaseHandlingService db, CommandHandlingService comm, StockMarketService markserv)
         {
             CompanyService = com;
             dataBaseService = db;
             CommandService = comm;
+            MarketService = markserv;
         }
 
         [Command("createcompany")]
         [Alias("createcorporation", "addcompany", "addcorporation")]
         [HasMasterOfBots]
-        public async Task CreateCompanyTask(string ticker, int startingShares, [Remainder]string name)
+        public async Task CreateCompanyTask(string ticker, [Remainder]string name)
         {
             Company company = new Company();
             company.name = name;
-            company.shares = startingShares;
+            company.shares = 0;
             company.id = ticker;
             company.employee = new Dictionary<string, Employee>();
             company.positions = new Dictionary<string, Position>();
@@ -90,7 +92,7 @@ namespace VIR.Modules
             {
                 Company temp = new Company(await dataBaseService.getJObjectAsync(ID, "companies"));
 
-                EmbedFieldBuilder tempEmb = new EmbedFieldBuilder().WithIsInline(true).WithName($"{temp.name} ({temp.id})").WithValue($"Share Price: ${temp.SharePrice}. Total Value: ${temp.SharePrice * temp.shares}. Amount of Shares: {temp.shares}");
+                EmbedFieldBuilder tempEmb = new EmbedFieldBuilder().WithIsInline(true).WithName($"{temp.name} ({temp.id})").WithValue($"Share Price: ${temp.SharePrice}. Total Value: ${temp.SharePrice * temp.shares}. Amount of Shares: {await MarketService.CorpShares(temp.id)}");
 
                 companyEmbedList.Add(tempEmb);
             }
@@ -143,15 +145,20 @@ namespace VIR.Modules
             else
             {
                 await dataBaseService.RemoveObjectAsync(ticker, "companies");
+
+                Collection<string> shareholderIDs = await dataBaseService.getIDs("shares");
+
+                foreach (string ID in shareholderIDs)
+                {
+                    UserShares shares = new UserShares(await dataBaseService.getJObjectAsync(ID, "shares"), true);
+
+                    shares.ownedShares.Remove(ticker);
+
+                    await dataBaseService.RemoveObjectAsync(ID, "shares");
+                    await dataBaseService.SetJObjectAsync(dataBaseService.SerializeObject<UserShares>(shares), "shares");
+                }
+
                 await ReplyAsync("Company deleted");
-            }
-
-            Collection<string> shareholderIDs = await dataBaseService.getIDs("shares");
-
-            foreach(string ID in shareholderIDs)
-            {
-                UserShares shares = new UserShares(await dataBaseService.getJObjectAsync(ID, "shares"), true);
-
             }
         }
 
