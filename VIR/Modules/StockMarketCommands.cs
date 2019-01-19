@@ -212,7 +212,8 @@ namespace VIR.Modules
         }
 
         [Command("buyoffer")]
-        public async Task SellOfferAsync(string ticker, int shares, double price)
+        [Alias("buyshares")]
+        public async Task BuyOfferAsync(string ticker, int shares, double price)
         {
             string AuthorMoneyt = (string) await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
             double AuthorMoney;
@@ -252,7 +253,8 @@ namespace VIR.Modules
         }
 
         [Command("selloffer")]
-        public async Task BuyOfferAsync(string ticker, int shares, double price)
+        [Alias("sellshares")]
+        public async Task SellOfferAsync(string ticker, int shares, double price)
         {
             string AuthorMoneyt = (string)await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
             double AuthorMoney;
