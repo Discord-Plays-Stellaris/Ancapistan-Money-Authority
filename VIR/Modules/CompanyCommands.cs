@@ -86,7 +86,7 @@ namespace VIR.Modules
             {
                 Company temp = new Company(await dataBaseService.getJObjectAsync(ID, "companies"));
 
-                EmbedFieldBuilder tempEmb = new EmbedFieldBuilder().WithIsInline(true).WithName($"{temp.name} ({temp.id})").WithValue($"Share Price: {temp.SharePrice}. Total Value: {temp.SharePrice * temp.shares}. Amount of Shares: {temp.shares}");
+                EmbedFieldBuilder tempEmb = new EmbedFieldBuilder().WithIsInline(true).WithName($"{temp.name} ({temp.id})").WithValue($"Share Price: ${temp.SharePrice}. Total Value: ${temp.SharePrice * temp.shares}. Amount of Shares: {temp.shares}");
 
                 companyEmbedList.Add(tempEmb);
             }
@@ -122,6 +122,25 @@ namespace VIR.Modules
                         await ReplyAsync("The position id you specified is invalid.");
                     }
                 }
+            }
+        }
+
+        [Command("deletecompany")]
+        [Alias("deletecorporation","removecorporation","removecompany")]
+        [HasMasterOfBots]
+        public async Task RemoveCorpAsync(string ticker)
+        {
+            Collection<string> tickers;
+            tickers = await dataBaseService.getIDs("companies");
+
+            if (!tickers.Contains(ticker))
+            {
+                await ReplyAsync("That company does not exist");
+            }
+            else
+            {
+                await dataBaseService.RemoveObjectAsync(ticker, "companies");
+                await ReplyAsync("Company deleted");
             }
         }
     }
