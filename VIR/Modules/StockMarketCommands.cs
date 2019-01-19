@@ -33,7 +33,7 @@ namespace VIR.Modules
         {
             StockMarketObject marketObj = new StockMarketObject(acronym, marketName);
 
-            JObject JSONObj = db.SerializeObject<StockMarketObject>(marketObj);
+            JObject JSONObj = db.SerializeObject(marketObj);
 
             await db.SetJObjectAsync(JSONObj, "system");
 
@@ -221,7 +221,7 @@ namespace VIR.Modules
             if (AuthorMoneyt == null)
             {
                 AuthorMoney = 50000;
-                await db.SetFieldAsync<double>(Context.User.Id.ToString(), "money", AuthorMoney, "users");
+                await db.SetFieldAsync(Context.User.Id.ToString(), "money", AuthorMoney, "users");
             }
             else
             {
