@@ -65,10 +65,24 @@ namespace VIR.Services
         /// </summary>
         /// <param name="obj">The JObject to be inserted</param>
         /// <param name="tableName">The table of the object.</param>
+        /// <param name="strict">Whether or not should an id conflict throw an exception. Useful when you know obj is a new addition to the db.</param>
         /// <returns></returns>
-        public async Task SetJObjectAsync(JObject obj, string tableName)
+        public async Task SetJObjectAsync(JObject obj, string tableName, bool strict = false)
         {
-            await r.Db("root").Table(tableName).Insert(obj).OptArg("conflict", "update").RunAsync(conn);
+            if(strict)
+            {
+                bool contains = r.Db("root").Table(tableName).Contains(obj["id"]).Run(conn);
+                if(contains)
+                {
+                    throw new Exception("IdMismatchException");
+                } else
+                {
+                    await r.Db("root").Table(tableName).Insert(obj).OptArg("conflict", "update").RunAsync(conn);
+                }
+            } else
+            {
+                await r.Db("root").Table(tableName).Insert(obj).OptArg("conflict", "update").RunAsync(conn);
+            }
         }
 
         /// <summary>

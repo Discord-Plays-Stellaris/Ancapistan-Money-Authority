@@ -100,14 +100,16 @@ namespace VIR.Modules
 
             try
             {
-                await db.SetJObjectAsync(db.SerializeObject<Transaction>(transaction), "transactions");
+                JObject tmp = db.SerializeObject(transaction);
+                tmp["id"] = Guid.NewGuid();
+                await db.SetJObjectAsync(tmp, "transactions");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                Environment.Exit(0);
+                await Log.Logger(Log.Logs.ERROR, e.Message);
+                await ReplyAsync("Something went wrong: " + e.Message);
             }
-            await ReplyAsync("Manual transaction complete" + type + ticker + shares + price);
+            await ReplyAsync("Manual transaction complete");
         }
     }
 }
