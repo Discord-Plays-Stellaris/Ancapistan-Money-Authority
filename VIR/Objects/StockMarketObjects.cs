@@ -85,7 +85,7 @@ namespace VIR.Objects
             author = _author;
             ticker = _ticker;
 
-            LodgeTransactionTask(db, command);
+           LodgeTransactionTask(db, command);
 
         }
 

@@ -191,8 +191,8 @@ namespace VIR.Modules
                         await MarketService.SetShares(transaction.author, transaction.ticker, _authorShares);
                         await MarketService.UpdateSharePrice(transaction);
 
-                        await db.SetFieldAsync<double>(Context.User.Id.ToString(), "money", userMoney, "users");
-                        await db.SetFieldAsync<double>(transaction.author, "money", authorMoney, "users");
+                        await db.SetFieldAsync(Context.User.Id.ToString(), "money", userMoney, "users");
+                        await db.SetFieldAsync(transaction.author, "money", authorMoney, "users");
                         await db.RemoveObjectAsync(offerID, "transactions");
 
                         await ReplyAsync("Transaction complete!");
@@ -260,7 +260,7 @@ namespace VIR.Modules
             if (AuthorMoneyt == null)
             {
                 AuthorMoney = 50000;
-                await db.SetFieldAsync<double>(Context.User.Id.ToString(), "money", AuthorMoney, "users");
+                await db.SetFieldAsync(Context.User.Id.ToString(), "money", AuthorMoney, "users");
             }
             else
             {
