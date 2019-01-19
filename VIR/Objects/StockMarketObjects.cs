@@ -103,25 +103,6 @@ namespace VIR.Objects
         }
     }
 
-    public class UsersWithShares
-    {
-        public string id = "UsersWithShares";
-        public List<string> UserList = new List<string>();
-
-        public UsersWithShares()
-        {
-            // code
-        }
-
-        public UsersWithShares(JObject input)
-        {
-            UsersWithShares tempObj = JsonConvert.DeserializeObject<UsersWithShares>(input.ToString());
-
-            id = tempObj.id;
-            UserList = tempObj.UserList;
-        }
-    }
-
     public class UserShares
     {
         public string id;
