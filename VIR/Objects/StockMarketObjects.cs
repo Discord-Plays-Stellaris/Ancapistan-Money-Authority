@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using VIR.Services;
+using Discord;
 
 namespace VIR.Objects
 {
@@ -48,7 +49,7 @@ namespace VIR.Objects
     /// </summary>
     public class Transaction
     {
-        public string id;
+        public Guid id;
         public double price;
         public int shares;
         public string type; // buy, sell, private
@@ -58,7 +59,7 @@ namespace VIR.Objects
 
         public Transaction(JObject JSONInput)
         {
-            id = (string)JSONInput["id"];
+            id = (Guid)JSONInput["id"];
             price = (double)JSONInput["price"];
             shares = (int)JSONInput["shares"];
             type = (string)JSONInput["type"];
@@ -74,8 +75,9 @@ namespace VIR.Objects
         /// <param name="_type">Buy, sell, or private</param>
         /// <param name="_author">The user who initiated the transaction</param>
         /// <param name="_ticker">The ticker of the company who's shares are being traded</param>
-        /// <param name="db">A DataBaseHandlingService object.</param>
-        public Transaction(double _price, int _shares, string _type, string _author, string _ticker, DataBaseHandlingService db)
+        /// <param name="db">A DataBaseHandlingService object</param>
+        /// <param name="command">A CommandHandlingService object</param>
+        public Transaction(double _price, int _shares, string _type, string _author, string _ticker, DataBaseHandlingService db, CommandHandlingService command)
         {
             price = _price;
             shares = _shares;
@@ -83,12 +85,21 @@ namespace VIR.Objects
             author = _author;
             ticker = _ticker;
 
+            LodgeTransactionTask(db, command);
+
         }
 
-        private async Task Save(DataBaseHandlingService db)
+        private async Task LodgeTransactionTask(DataBaseHandlingService db, CommandHandlingService CommandService)
         {
-            await db.SetJObjectAsync(db.SerializeObject<Transaction>(this), "transactions");
-            Console.Write("");
+            EmbedFieldBuilder typeField = new EmbedFieldBuilder().WithIsInline(true).WithName("Type:").WithValue($"Looking to {type} shares");
+            EmbedFieldBuilder companyField = new EmbedFieldBuilder().WithIsInline(true).WithName("Company:").WithValue(await db.GetFieldAsync(ticker, "name", "companies"));
+            EmbedFieldBuilder amountField = new EmbedFieldBuilder().WithIsInline(true).WithName("Amount of shares being bought/sold:").WithValue(shares);
+            EmbedFieldBuilder priceField = new EmbedFieldBuilder().WithIsInline(true).WithName("Price per share:").WithValue("$" + price);
+            EmbedFieldBuilder totalPriceField = new EmbedFieldBuilder().WithIsInline(true).WithName("Total Price:").WithValue("$" + shares * price);
+
+            EmbedBuilder emb = new EmbedBuilder().WithTitle("Stock Market Offer").WithDescription($"Use the command `&accept {id.ToString()}` to accept this offer.").WithFooter($"Transaction ID: {id.ToString()}").AddField(typeField).AddField(companyField).AddField(amountField).AddField(priceField).AddField(totalPriceField).WithColor(Color.Green);
+
+            await CommandService.PostEmbedTask((string)await db.GetFieldAsync("MarketChannel","channel","system"), emb.Build());
         }
     }
 

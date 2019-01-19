@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Discord.Net;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
@@ -97,6 +98,16 @@ namespace VIR.Services
         public async Task PostMessageTask(string channel, string message)
         {
             await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync(message);
+        }
+
+        /// <summary>
+        /// Posts an embed to the specified channel
+        /// </summary>
+        /// <param name="channel">The channel to post the message in</param>
+        /// <param name="embed">The embed to be posted.</param>
+        public async Task PostEmbedTask(string channel, Embed embed)
+        {
+            await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync("", false, embed);
         }
     }
 }
