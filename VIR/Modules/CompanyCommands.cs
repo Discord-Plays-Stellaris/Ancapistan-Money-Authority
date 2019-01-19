@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using VIR.Modules.Objects.Company;
 using VIR.Modules.Preconditions;
 using VIR.Services;
+using VIR.Objects;
 
 namespace VIR.Modules
 {
@@ -130,8 +131,7 @@ namespace VIR.Modules
         [HasMasterOfBots]
         public async Task RemoveCorpAsync(string ticker)
         {
-            Collection<string> tickers;
-            tickers = await dataBaseService.getIDs("companies");
+            Collection<string> tickers = await dataBaseService.getIDs("companies");
 
             if (!tickers.Contains(ticker))
             {
@@ -141,6 +141,14 @@ namespace VIR.Modules
             {
                 await dataBaseService.RemoveObjectAsync(ticker, "companies");
                 await ReplyAsync("Company deleted");
+            }
+
+            Collection<string> shareholderIDs = await dataBaseService.getIDs("shares");
+
+            foreach(string ID in shareholderIDs)
+            {
+                UserShares shares = new UserShares(await dataBaseService.getJObjectAsync(ID, "shares"), true);
+
             }
         }
     }
