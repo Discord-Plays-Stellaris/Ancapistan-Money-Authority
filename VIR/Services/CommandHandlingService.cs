@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace VIR.Services
 {
@@ -108,6 +109,14 @@ namespace VIR.Services
         public async Task PostEmbedTask(string channel, Embed embed)
         {
             await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync("", false, embed);
+        }
+
+        ///<summary>
+        ///Gets all available commands.
+        ///</summary>
+        public async Task<IEnumerable<CommandInfo>> getCommands()
+        {
+            return __commands.Commands;
         }
     }
 }

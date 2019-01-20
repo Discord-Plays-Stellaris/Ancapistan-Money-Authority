@@ -42,6 +42,7 @@ namespace VIR.Modules
 
         [Command("market")]
         [Alias("marketinfo")]
+        [Summary("Gets basic info of the market.")]
         public async Task MarketInfoTask()
         {
             string name = Convert.ToString(await db.GetFieldAsync("MarketInfo", "marketName", "system"));
@@ -84,12 +85,10 @@ namespace VIR.Modules
         }
 
         [Command("getshares")]
-        public async Task GetSharesAsync(string user, string ticker)
+        [Summary("Gets the shares owned in a company currently owned by an user.")]
+        public async Task GetSharesAsync([Summary("The target user.")]IUser user, [Summary("The specific company.")]string ticker)
         {
-            user = user.Remove(user.Length - 1, 1);
-            user = user.Remove(0, 2);
-
-            await ReplyAsync($"<@{user}> has {Convert.ToString(await MarketService.GetShares(user, ticker))} shares in {ticker}");
+            await ReplyAsync($"{user.Mention} has {Convert.ToString(await MarketService.GetShares(user.Id.ToString(), ticker))} shares in {ticker}");
         }
 
         [Command("transaction")]
@@ -115,7 +114,8 @@ namespace VIR.Modules
 
         [Command("accept")]
         [Alias("acceptoffer")]
-        public async Task AcceptOfferAsync(string offerID)
+        [Summary("Accepts an offer")]
+        public async Task AcceptOfferAsync([Summary("The ID of the offer.")]string offerID)
         {
             Collection<string> IDs = await db.getIDs("transactions");
             string userMoneyt;
@@ -213,7 +213,8 @@ namespace VIR.Modules
 
         [Command("buyoffer")]
         [Alias("buyshares")]
-        public async Task BuyOfferAsync(string ticker, int shares, double price)
+        [Summary("Set up an offer to buy")]
+        public async Task BuyOfferAsync([Summary("Comapny ticker")]string ticker, [Summary("Share amount you wish to buy")]int shares, [Summary("Price per share")]double price)
         {
             string AuthorMoneyt = (string) await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
             double AuthorMoney;
@@ -254,7 +255,8 @@ namespace VIR.Modules
 
         [Command("selloffer")]
         [Alias("sellshares")]
-        public async Task SellOfferAsync(string ticker, int shares, double price)
+        [Summary("Put up shares for sale.")]
+        public async Task SellOfferAsync([Summary("The ticker of the company whose shares you want to sell")] string ticker, [Summary("The amount of shares you wish to sell")]int shares, [Summary("Price per share")]double price)
         {
             string AuthorMoneyt = (string)await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
             double AuthorMoney;
@@ -299,6 +301,7 @@ namespace VIR.Modules
         }
 
         [Command("shares")]
+        [Summary("Gets the shares owned by you.")]
         public async Task SharesAsync()
         {
             UserShares sharesObj;

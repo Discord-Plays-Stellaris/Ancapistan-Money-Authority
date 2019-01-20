@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using VIR.Objects.Company;
 
 namespace VIR.Modules.Objects.Company
 {
@@ -20,6 +21,7 @@ namespace VIR.Modules.Objects.Company
         public int money;
         public int shares;
         public double SharePrice;
+        public Dictionary<string, JobOffer> jobOffers;
 
         public Company()
         {
@@ -48,6 +50,7 @@ namespace VIR.Modules.Objects.Company
             SharePrice = tempObj.SharePrice;
             employee = tempObj.employee;
             positions = tempObj.positions;
+            jobOffers = tempObj.jobOffers;
         }
         public JObject serializeIntoJObject()
         {
