@@ -38,7 +38,7 @@ namespace VIR.Modules
         [Command("createcompany")]
         [Alias("createcorporation", "addcompany", "addcorporation")]
         [HasMasterOfBots]
-        public async Task CreateCompanyTask(IUser CEO, string ticker, int startingShares, [Remainder]string name)
+        public async Task CreateCompanyTask(IUser CEO, string ticker, [Remainder]string name)
         {
             Company company = new Company();
             company.name = name;
