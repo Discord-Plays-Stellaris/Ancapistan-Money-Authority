@@ -38,7 +38,7 @@ namespace VIR.Modules
         [Command("createcompany")]
         [Alias("createcorporation", "addcompany", "addcorporation")]
         [HasMasterOfBots]
-        public async Task CreateCompanyTask(IUser CEO, string ticker, int startingShares, [Remainder]string name)
+        public async Task CreateCompanyTask(IUser CEO, string ticker, [Remainder]string name)
         {
             Company company = new Company();
             company.name = name;
@@ -212,14 +212,14 @@ namespace VIR.Modules
                 await ReplyAsync("You do not have the permission to fire/hire positions.");
                 return;
             }
-            if (company.employee[Context.User.Id.ToString()].position.level < company.positions[positionid].level)
-            {
-                await ReplyAsync("You cannot give someone a higher role than you have.");
-                return;
-            }
             if (!company.positions.ContainsKey(positionid))
             {
                 await ReplyAsync("The position id you specified is invalid.");
+                return;
+            }
+            if (company.employee[Context.User.Id.ToString()].position.level < company.positions[positionid].level)
+            {
+                await ReplyAsync("You cannot give someone a higher role than you have.");
                 return;
             }
             if (wage < 0 || salary < 0)
