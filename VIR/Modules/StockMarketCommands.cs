@@ -226,6 +226,7 @@ namespace VIR.Modules
             if (shares < 0 || price < 0)
             {
                 await ReplyAsync("You cant buy negative shares nor buy them for a negative amount of money!");
+                return;
             }
 
             if (AuthorMoneyt == null)
@@ -273,6 +274,7 @@ namespace VIR.Modules
             if (shares < 0 || price < 0)
             {
                 await ReplyAsync("You cant sell negative shares sell buy them for a negative amount of money!");
+                return;
             }
 
             if (AuthorMoneyt == null)
