@@ -92,6 +92,33 @@ namespace VIR.Modules
             await ReplyAsync($"<@{user}> has {Convert.ToString(await MarketService.GetShares(user, ticker))} shares in {ticker}");
         }
 
+        [Command("getcorpshares")]
+        [HasMasterOfBots]
+        public async Task GetCorpSharesAsync(string tickerOwner, string tickerShare)
+        {
+            if(tickerOwner == tickerShare)
+            {
+                await ReplyAsync("A company can't own shares in itself, silly!");
+                return;
+            }
+
+            await ReplyAsync($"{tickerOwner} has {Convert.ToString(await MarketService.GetShares(tickerOwner, tickerShare))} shares in {tickerShare}");
+        }
+
+        [Command("setcorpshares")]
+        [HasMasterOfBots]
+        public async Task SetCorpSharesAsync(string tickerOwner, string tickerShare, string amount)
+        {
+            if (tickerOwner == tickerShare)
+            {
+                await ReplyAsync("A company can't own shares in itself, silly!");
+                return;
+            }
+
+            await MarketService.SetShares(tickerOwner, tickerShare, Convert.ToInt32(amount));
+            await ReplyAsync($"<@{tickerOwner}>'s shares in {tickerShare} set to {amount}");
+        }
+
         [Command("transaction")]
         [HasMasterOfBots]
         public async Task ManualTransactionAsync(string type, string ticker, int shares, double price)
