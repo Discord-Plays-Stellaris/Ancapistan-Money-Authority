@@ -91,6 +91,33 @@ namespace VIR.Modules
             await ReplyAsync($"{user.Mention} has {Convert.ToString(await MarketService.GetShares(user.Id.ToString(), ticker))} shares in {ticker}");
         }
 
+        [Command("getcorpshares")]
+        [HasMasterOfBots]
+        public async Task GetCorpSharesAsync(string tickerOwner, string tickerShare)
+        {
+            if(tickerOwner == tickerShare)
+            {
+                await ReplyAsync("A company can't own shares in itself, silly!");
+                return;
+            }
+
+            await ReplyAsync($"{tickerOwner} has {Convert.ToString(await MarketService.GetShares(tickerOwner, tickerShare))} shares in {tickerShare}");
+        }
+
+        [Command("setcorpshares")]
+        [HasMasterOfBots]
+        public async Task SetCorpSharesAsync(string tickerOwner, string tickerShare, string amount)
+        {
+            if (tickerOwner == tickerShare)
+            {
+                await ReplyAsync("A company can't own shares in itself, silly!");
+                return;
+            }
+
+            await MarketService.SetShares(tickerOwner, tickerShare, Convert.ToInt32(amount));
+            await ReplyAsync($"<@{tickerOwner}>'s shares in {tickerShare} set to {amount}");
+        }
+
         [Command("transaction")]
         [HasMasterOfBots]
         public async Task ManualTransactionAsync(string type, string ticker, int shares, double price)
@@ -271,14 +298,35 @@ namespace VIR.Modules
                 AuthorMoney = double.Parse(AuthorMoneyt);
             }
 
-            UserShares tempObj = new UserShares(await db.getJObjectAsync(Context.User.Id.ToString(), "shares"), true);
+            UserShares tempObj;
+
+            try
+            {
+                tempObj = new UserShares(await db.getJObjectAsync(Context.User.Id.ToString(), "shares"), true);
+            }
+            catch (System.NullReferenceException)
+            {
+                tempObj = new UserShares(Context.User.Id.ToString());
+                await ReplyAsync("You cannot complete this transaction as you own no shares in the specified company");
+                return;
+            }
             Dictionary<string, int> ownedShares = tempObj.ownedShares;
+
+            if (ownedShares.ContainsKey(ticker) == false)
+            {
+                await ReplyAsync("You cannot complete this transaction as you own no shares in the specified company");
+                return;
+            }
 
             int outcomeAmount = ownedShares[ticker] - shares;
 
             if (outcomeAmount < 0)
             {
                 await ReplyAsync("You cannot complete this transaction as it would leave you with a negative amount of shares in the specified company.");
+            }
+            else if (ownedShares[ticker] == 0)
+            {
+                await ReplyAsync("You cannot complete this transaction as you own no shares in the specified company.");
             }
             else
             {
@@ -332,7 +380,7 @@ namespace VIR.Modules
                 embed.AddField(field);
             }
 
-            await ReplyAsync("You shares have been sent to you privately");
+            await ReplyAsync("Your shares have been sent to you privately");
             await Context.User.SendMessageAsync("", false, embed.Build());
         }
     }

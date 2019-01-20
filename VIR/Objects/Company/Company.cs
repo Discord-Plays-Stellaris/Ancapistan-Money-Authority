@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using VIR.Objects.Company;
+using VIR.Services;
 
 namespace VIR.Modules.Objects.Company
 {
@@ -13,6 +14,7 @@ namespace VIR.Modules.Objects.Company
     /// </summary>
     public class Company
     {
+
         public string id;
         public string name;
         public Dictionary<string, Employee> employee; //Format: userid, title
