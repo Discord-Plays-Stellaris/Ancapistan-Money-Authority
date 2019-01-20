@@ -201,6 +201,8 @@ namespace VIR.Modules
         public async Task hireEmployee([Summary("User you wish to hire.")]IUser user, [Summary("Company ticker.")]string ticker, [Summary("The ID of the position you want to hire the user to.")]string positionid, [Summary("Desired wage.")]int wage, [Summary("Desired salary.")]int salary)
         {
             Company company = await CompanyService.getCompany(ticker);
+
+
             if (!company.employee.ContainsKey(Context.User.Id.ToString()))
             {
                 await ReplyAsync($"You are not an employee in {company.name}");
