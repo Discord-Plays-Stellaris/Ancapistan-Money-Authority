@@ -56,7 +56,7 @@ namespace VIR.Modules
         }
 
         [Command("marketchannel")]
-        [Alias("setmarketchannel","transactionchannel","settransactionchannel")]
+        [Alias("setmarketchannel", "transactionchannel", "settransactionchannel")]
         [HasMasterOfBots]
         public async Task MarketChannelTask(string channel)
         {
@@ -70,15 +70,13 @@ namespace VIR.Modules
             await CommandService.PostMessageTask(channel, "This channel has been set as the transaction announcement channel!");
 
             await ReplyAsync($"Market channel set to <#{channel}>");
-            
-        }
 
+        }
         [Command("setshares")]
         [HasMasterOfBots]
-        public async Task SetSharesTask(string user, string ticker, string amount)
+        public async Task SetSharesTask(IUser iuser, string ticker, string amount)
         {
-            user = user.Remove(user.Length - 1, 1);
-            user = user.Remove(0, 2);
+            string user = iuser.Id.ToString();
 
             await MarketService.SetShares(user, ticker, Convert.ToInt32(amount));
             await ReplyAsync($"<@{user}>'s shares in {ticker} set to {amount}");
@@ -95,7 +93,7 @@ namespace VIR.Modules
         [HasMasterOfBots]
         public async Task GetCorpSharesAsync(string tickerOwner, string tickerShare)
         {
-            if(tickerOwner == tickerShare)
+            if (tickerOwner == tickerShare)
             {
                 await ReplyAsync("A company can't own shares in itself, silly!");
                 return;
@@ -116,27 +114,6 @@ namespace VIR.Modules
 
             await MarketService.SetShares(tickerOwner, tickerShare, Convert.ToInt32(amount));
             await ReplyAsync($"<@{tickerOwner}>'s shares in {tickerShare} set to {amount}");
-        }
-
-        [Command("transaction")]
-        [HasMasterOfBots]
-        public async Task ManualTransactionAsync(string type, string ticker, int shares, double price)
-        {
-            Transaction transaction = new Transaction(price, shares, type, Context.User.Id.ToString(), ticker, db, CommandService);
-
-            try
-            {
-                Guid GUID = Guid.NewGuid();
-                transaction.id = GUID;
-                JObject tmp = db.SerializeObject(transaction);
-                await db.SetJObjectAsync(tmp, "transactions");
-                await ReplyAsync($"Manual transaction lodged in <#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");
-            }
-            catch (Exception e)
-            {
-                await Log.Logger(Log.Logs.ERROR, e.Message);
-                await ReplyAsync("Something went wrong: " + e.Message);
-            }
         }
 
         [Command("accept")]
@@ -243,8 +220,14 @@ namespace VIR.Modules
         [Summary("Set up an offer to buy")]
         public async Task BuyOfferAsync([Summary("Comapny ticker")]string ticker, [Summary("Share amount you wish to buy")]int shares, [Summary("Price per share")]double price)
         {
-            string AuthorMoneyt = (string) await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
+            string AuthorMoneyt = (string)await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
             double AuthorMoney;
+
+            if (shares < 0 || price < 0)
+            {
+                await ReplyAsync("You cant buy negative shares nor buy them for a negative amount of money!");
+                return;
+            }
 
             if (AuthorMoneyt == null)
             {
@@ -287,6 +270,12 @@ namespace VIR.Modules
         {
             string AuthorMoneyt = (string)await db.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
             double AuthorMoney;
+
+            if (shares < 0 || price < 0)
+            {
+                await ReplyAsync("You cant sell negative shares sell buy them for a negative amount of money!");
+                return;
+            }
 
             if (AuthorMoneyt == null)
             {

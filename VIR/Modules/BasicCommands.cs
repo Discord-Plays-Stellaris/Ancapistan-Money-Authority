@@ -68,7 +68,8 @@ namespace VIR.Modules
                     fieldCounter++;
                 }
             }
-            await ReplyAsync(null, false, embed.Build());
+            await ReplyAsync("The help list has been DMed to you.");
+            await Context.User.SendMessageAsync(null, false, embed.Build());
         }
     }
 }
