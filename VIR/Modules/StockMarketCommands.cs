@@ -75,10 +75,9 @@ namespace VIR.Modules
 
         [Command("setshares")]
         [HasMasterOfBots]
-        public async Task SetSharesTask(string user, string ticker, string amount)
+        public async Task SetSharesTask(IUser iuser, string ticker, string amount)
         {
-            user = user.Remove(user.Length - 1, 1);
-            user = user.Remove(0, 2);
+            string user = iuser.Id.ToString();
 
             await MarketService.SetShares(user, ticker, Convert.ToInt32(amount));
             await ReplyAsync($"<@{user}>'s shares in {ticker} set to {amount}");
