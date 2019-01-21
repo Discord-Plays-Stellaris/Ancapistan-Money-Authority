@@ -24,6 +24,7 @@ namespace VIR.Modules.Objects.Company
         public int shares;
         public double SharePrice;
         public Dictionary<string, JobOffer> jobOffers;
+        public Dictionary<string, int> industries;
 
         public Company()
         {
@@ -53,6 +54,7 @@ namespace VIR.Modules.Objects.Company
             employee = tempObj.employee;
             positions = tempObj.positions;
             jobOffers = tempObj.jobOffers;
+            industries = tempObj.industries;
         }
         public JObject serializeIntoJObject()
         {
