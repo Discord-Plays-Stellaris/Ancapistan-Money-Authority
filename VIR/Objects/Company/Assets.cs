@@ -10,22 +10,35 @@ namespace VIR.Objects.Company
 {
     class Industry
     {
-        public string id; // MINE, FARM, ALLOY, CG
-        public string resource; // What resource this industry produces
-        public int price; // The price of the industry
+        public string Id; // 
+        public string Type; /* What resource this industry produces 
+                            MNRL - Minerals
+                            FOOD - Food
+                            ALLY - Alloys
+                            CSGD - Consumer Goods
+                            RFML - Refined Minerals
+                            RFFD - Refined Food
+                            */
+        public ulong YearlyOutput; // Output of resources per year
+        public ulong UtilOutput; // Output of resources per Util spent
+        public int Utils; // Amount of Utils the industry has left to spend (max 100)
 
-        public Industry(string _id, string _resource, int _price)
+        public Industry(string id, string type, ulong yearlyOutput, ulong utilOutput, int utils)
         {
-            id = _id;
-            resource = _resource;
-            price = _price;
+            Id = id;
+            Type = type;
+            YearlyOutput = yearlyOutput;
+            UtilOutput = utilOutput;
+            Utils = utils;
         }
 
         public Industry(JObject dbInput)
         {
-            id = (string)dbInput["id"];
-            resource = (string)dbInput["resiyrce"];
-            price = (int)dbInput["price"];
+            Id = (string)dbInput["id"];
+            Type = (string)dbInput["type"];
+            YearlyOutput = (ulong)dbInput["yearlyOutput"];
+            UtilOutput = (ulong) dbInput["utilOutput"];
+            Utils = (int) dbInput["utils"];
         }
     }
 
