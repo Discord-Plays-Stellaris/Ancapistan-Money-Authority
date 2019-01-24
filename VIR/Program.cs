@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
 using System.IO;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using VIR.Services;
+using VIR.Properties;
 
 namespace VIR
 {
@@ -28,8 +24,7 @@ namespace VIR
 
                 __client.Log += LogAsync;
 
-                const string tokenPath = @"token.txt";
-                string botToken = File.ReadAllText(tokenPath);
+                string botToken = Resources.token;
 
                 await __client.LoginAsync(TokenType.Bot, botToken); //Log in the bot
                 await __client.StartAsync(); //Start the bot
@@ -59,6 +54,8 @@ namespace VIR
                 .AddSingleton<HttpClient>() //HTTP client
                 .AddSingleton<DataBaseHandlingService>() //Database Handling Service, manipulates rDB data
                 .AddSingleton<AgeService>() //Age Service, sort of a wrapper for Database Handling Service
+                .AddSingleton<CompanyService>()
+                .AddSingleton<StockMarketService>() // Methods and shit for the Stock Market. #bestservice
                 .BuildServiceProvider();
         }
     }

@@ -1,61 +1,16 @@
 ﻿using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using VIR.Modules.Objects.Company;
+using Discord;
+using System.Collections.ObjectModel;
 
 namespace VIR.Services
 {
-    class CompanyService
+    public class CompanyService
     {
         private readonly DataBaseHandlingService __database;
-        public class Company
-        {
-            public string ticker;
-            public string name;
-            public Dictionary<string, string> employee; //Format: userid, title
-            public Dictionary<string, int> assets; //thing, amount
-            public int money;
-            public Company(JObject companyDbEntry)
-            {
-                ticker = (string)companyDbEntry["id"];
-                name = (string)companyDbEntry["name"];
-                foreach(JObject x in (Array)companyDbEntry["employees"])
-                {
-                    employee.Add((string)x["id"], (string)x["titles"]);
-                }
-                foreach (JObject x in (Array)companyDbEntry["assets"])
-                {
-                    assets.Add((string)x["id"], (int)x["amount"]);
-                }
-                money = (int)companyDbEntry["money"];
-            }
-            public JObject serializeIntoJObject()
-            {
-                JObject temp = new JObject();
-                temp["name"] = name;
-                Collection<JObject> tmp = new Collection<JObject>();
-                foreach (string key in employee.Keys)
-                {
-                    JObject x = new JObject();
-                    x["id"] = key;
-                    x["titles"] = employee[key];
-                }
-                temp["employees"] = new JArray(tmp.ToArray());
-                Collection<JObject> tmp2 = new Collection<JObject>();
-                foreach (string key in assets.Keys)
-                {
-                    JObject x = new JObject();
-                    x["id"] = key;
-                    x["amount"] = employee[key];
-                }
-                temp["assets"] = new JArray(tmp.ToArray());
-                temp["money"] = money;
-                return temp;
-            }
-        }
         public CompanyService(IServiceProvider services, DataBaseHandlingService database)
         {
             __database = database;
@@ -68,7 +23,16 @@ namespace VIR.Services
         }
         public async Task setCompany(Company company)
         {
-            await __database.SetJObjectAsync(company.ticker, company.serializeIntoJObject(), "companies");
+            await __database.SetJObjectAsync(company.serializeIntoJObject(), "companies");
         }
-    }
+        public async Task<Collection<Company>> findEmployee(IUser user)
+        {
+            Collection<Company> companies = new Collection<Company>();
+            foreach (JObject x in JArray.FromObject(await __database.GetFieldAsync(user.Id.ToString(), "companies", "users")))
+            {
+                companies.Add(await getCompany((string)x));
+            }
+            return companies;
+        }
+    } 
 }

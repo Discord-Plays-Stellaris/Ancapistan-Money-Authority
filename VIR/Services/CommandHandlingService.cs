@@ -1,13 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Discord.Net;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace VIR.Services
 {
@@ -56,29 +55,29 @@ namespace VIR.Services
             //await Log.Logger(Log.Logs.INFO, result.IsSuccess.ToString());
             if (result.Error == null)
             {
-                Console.WriteLine("Result Error Null");
-                ; return;
+                //Console.WriteLine("Result Error Null");
+                return;
             }
             if (result.Error.Value == CommandError.UnknownCommand)
             {
-                Console.WriteLine("Unknown Command");
+                //Console.WriteLine("Unknown Command");
                 return;
             }
             if (result.Error.Value == CommandError.UnmetPrecondition)
             {
                 await context.Channel.SendMessageAsync($"The following condition has failed: {result.ErrorReason}");
-                Console.WriteLine("Unmet Precondition");
+                //Console.WriteLine("Unmet Precondition");
                 return;
             }
             if (result.Error.Value == CommandError.BadArgCount)
             {
                 await context.Channel.SendMessageAsync($"Not enough arguments for the command!");
-                Console.WriteLine("Not enough arguments");
+                //Console.WriteLine("Not enough arguments");
                 return;
             }
 
             if (result.IsSuccess) { 
-                Console.WriteLine("Success!");
+                //Console.WriteLine("Success!");
                 return;
             }   
             await context.Channel.SendMessageAsync($"There was an error running the command, please try it again and if the problem persists contact towergame#9726. {result.ErrorReason}");
@@ -89,6 +88,35 @@ namespace VIR.Services
         {
             Log.Logger(Log.Logs.INFO, log.ToString());
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Posts a message to the specified channel
+        /// </summary>
+        /// <param name="channel">The channel to post the message in</param>
+        /// <param name="message">The message to be posted.</param>
+        /// <returns></returns>
+        public async Task PostMessageTask(string channel, string message)
+        {
+            await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync(message);
+        }
+
+        /// <summary>
+        /// Posts an embed to the specified channel
+        /// </summary>
+        /// <param name="channel">The channel to post the message in</param>
+        /// <param name="embed">The embed to be posted.</param>
+        public async Task PostEmbedTask(string channel, Embed embed)
+        {
+            await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync("", false, embed);
+        }
+
+        ///<summary>
+        ///Gets all available commands.
+        ///</summary>
+        public async Task<IEnumerable<CommandInfo>> getCommands()
+        {
+            return __commands.Commands;
         }
     }
 }
