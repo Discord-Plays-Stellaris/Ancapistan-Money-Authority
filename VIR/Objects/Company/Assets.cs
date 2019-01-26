@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using VIR.Services;
 
 namespace VIR.Objects.Company
 {
     class Industry
     {
-        public string Id; // 
+        public string Id; // Ticker
         public string Type; /* What resource this industry produces 
                             MNRL - Minerals
                             FOOD - Food
@@ -19,72 +20,89 @@ namespace VIR.Objects.Company
                             RFML - Refined Minerals
                             RFFD - Refined Food
                             */
-        public ulong YearlyOutput; // Output of resources per year
-        public ulong UtilOutput; // Output of resources per Util spent
+        public ulong MonthlyOutput; // Output of resources per year
         public int Utils; // Amount of Utils the industry has left to spend (max 100)
+        public string PlanetId; // What planet the industry is on
 
-        public Industry(string id, string type, ulong yearlyOutput, ulong utilOutput, int utils)
+        public Industry(string id, string type, ulong monthlyOutput, int utils, string planetId)
         {
             Id = id;
             Type = type;
-            YearlyOutput = yearlyOutput;
-            UtilOutput = utilOutput;
+            MonthlyOutput = monthlyOutput;
             Utils = utils;
+            PlanetId = planetId;
         }
 
         public Industry(JObject dbInput)
         {
             Id = (string)dbInput["id"];
             Type = (string)dbInput["type"];
-            YearlyOutput = (ulong)dbInput["yearlyOutput"];
-            UtilOutput = (ulong) dbInput["utilOutput"];
+            MonthlyOutput = (ulong)dbInput["monthlyOutput"];
             Utils = (int) dbInput["utils"];
+            PlanetId = (string) dbInput["planetId"];
+        }
+
+        public JObject SerializeIntoJObject()
+        {
+            var jsonString = JsonConvert.SerializeObject(this);
+            var jObject = JObject.Parse(jsonString);
+            return jObject;
         }
     }
 
-    class Assets
+    public class Resource
     {
-        public string id; // ticker
-        public Dictionary<string,int> industries;
-        public Dictionary<string,int> resources;
+        public string Id; // Id of the owner, can either be a company or a person
+        public ulong Minerals;
+        public ulong Food;
+        public ulong Alloys;
+        public ulong ConsumerGoods;
+        public ulong RefinedMinerals;
+        public ulong RefinedFood;
 
-        public Assets(string ticker)
+        // This makes a new entry into the Resources table, only use this when making a new entry
+        public Resource(string id)
         {
-            id = ticker;
-            industries = new Dictionary<string, int>();
-            resources = new Dictionary<string, int>();
-        }
+            Id = id;
+            Minerals = 0L;
+            Food = 0L;
+            Alloys = 0L;
+            ConsumerGoods = 0L;
+            RefinedMinerals = 0L;
+            RefinedFood = 0L;
 
-        public Assets(JObject json, bool isJSON)
-        {
-            Assets obj = JsonConvert.DeserializeObject<Assets>(json.ToString());
+            var check = ResourceHandlingService._instance.GetResource(id);
 
-            id = obj.id;
-            industries = obj.industries;
-        }
-    }
+            if (check!=null)
+            {
+                var alreadyExists = new Resource(check);
+                Minerals = alreadyExists.Minerals;
+                Food = alreadyExists.Food;
+                Alloys = alreadyExists.Alloys;
+                ConsumerGoods = alreadyExists.ConsumerGoods;
+                RefinedMinerals = alreadyExists.RefinedMinerals;
+                RefinedFood = alreadyExists.RefinedFood;
+            }
 
-    class Resource
-    {
-        public string id;
-        public bool processed; // false: raw resources, true: refined resource
-        public double demandModifier; // a number which is mulitplied by a random int to get the resource's demand
-        public int demand; 
-
-        public Resource(string _id, bool _processed, double _demandmod, int _demand)
-        {
-            demand = _demand;
-            demandModifier = _demandmod;
-            id = _id;
-            processed = _processed;
+            ResourceHandlingService._instance.InsertIntoResources(this.SerializeIntoJObject());
         }
 
         public Resource(JObject JSON)
         {
-            demand = (int)JSON["demand"];
-            demandModifier = (double)JSON["demandModifier"];
-            id = (string)JSON["id"];
-            processed = (bool)JSON["processed"];
+            Id = (string) JSON["id"];
+            Minerals = (ulong) JSON["minerals"];
+            Food = (ulong)JSON["food"];
+            Alloys = (ulong)JSON["alloys"];
+            ConsumerGoods = (ulong)JSON["consumergoods"];
+            RefinedMinerals = (ulong)JSON["refinedminerals"];
+            RefinedFood = (ulong)JSON["refinedfood"];
+        }
+
+        public JObject SerializeIntoJObject()
+        {
+            var jsonString = JsonConvert.SerializeObject(this);
+            var jObject = JObject.Parse(jsonString);
+            return jObject;
         }
     }
 }
