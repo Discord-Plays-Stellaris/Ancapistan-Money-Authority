@@ -59,8 +59,7 @@ namespace VIR.Objects.Company
         public ulong ConsumerGoods;
         public ulong RefinedMinerals;
         public ulong RefinedFood;
-
-        // This makes a new entry into the Resources table, only use this when making a new entry
+        
         public Resource(string id)
         {
             Id = id;
@@ -70,21 +69,6 @@ namespace VIR.Objects.Company
             ConsumerGoods = 0L;
             RefinedMinerals = 0L;
             RefinedFood = 0L;
-
-            var check = ResourceHandlingService._instance.GetResource(id);
-
-            if (check!=null)
-            {
-                var alreadyExists = new Resource(check);
-                Minerals = alreadyExists.Minerals;
-                Food = alreadyExists.Food;
-                Alloys = alreadyExists.Alloys;
-                ConsumerGoods = alreadyExists.ConsumerGoods;
-                RefinedMinerals = alreadyExists.RefinedMinerals;
-                RefinedFood = alreadyExists.RefinedFood;
-            }
-
-            ResourceHandlingService._instance.InsertIntoResources(this.SerializeIntoJObject());
         }
 
         public Resource(JObject JSON)

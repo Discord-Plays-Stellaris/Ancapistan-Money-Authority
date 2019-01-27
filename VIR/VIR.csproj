@@ -209,6 +209,9 @@
     <Compile Include="Modules\Preconditions\HasMasterOfBotsAttribute.cs" />
     <Compile Include="Modules\Preconditions\IsInDPSGuildAttribute.cs" />
     <Compile Include="Objects\Planet.cs" />
+    <Compile Include="Objects\ResourceMarketListing.cs" />
+    <Compile Include="Objects\ResourceTransaction.cs" />
+    <Compile Include="Objects\ResourceTransferResult.cs" />
     <Compile Include="Objects\StockMarketObjects.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
