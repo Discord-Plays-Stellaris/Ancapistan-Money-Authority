@@ -261,3 +261,6 @@ __pycache__/
 *.pyc
 /VIR/Properties/Resources.resx
 /VIR/Properties/Resources.Designer.cs
+
+# I don't know what this is but it's annoying me
+*.sqlite

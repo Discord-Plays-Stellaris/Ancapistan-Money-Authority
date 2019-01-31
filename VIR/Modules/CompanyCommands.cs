@@ -8,9 +8,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using VIR.Modules.Objects.Company;
 using VIR.Modules.Preconditions;
-using VIR.Objects.Company;
 using VIR.Services;
 using VIR.Objects;
+using VIR.Objects.Company;
 using VIR.Properties;
 
 namespace VIR.Modules
@@ -54,6 +54,7 @@ namespace VIR.Modules
             company.employee = new Dictionary<string, Employee>();
             company.positions = new Dictionary<string, Position>();
             company.jobOffers = new Dictionary<string, JobOffer>();
+            company.industries = new Dictionary<string, int>();
             Employee employee = new Employee();
             employee.userID = CEO.Id.ToString();
             employee.salary = 0;
@@ -208,6 +209,8 @@ namespace VIR.Modules
         public async Task hireEmployee([Summary("User you wish to hire.")]IUser user, [Summary("Company ticker.")]string ticker, [Summary("The ID of the position you want to hire the user to.")]string positionid, [Summary("Desired wage.")]int wage, [Summary("Desired salary.")]int salary)
         {
             Company company = await CompanyService.getCompany(ticker);
+
+
             if (!company.employee.ContainsKey(Context.User.Id.ToString()))
             {
                 await ReplyAsync($"You are not an employee in {company.name}");
