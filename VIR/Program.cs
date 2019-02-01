@@ -1,5 +1,4 @@
 ﻿using System.Net.Http;
-using System.IO;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -17,14 +16,24 @@ namespace VIR
 
         public async Task MainAsync()
         {
+            bool isDebugMode = false;
+            #if DEBUG
+            isDebugMode = true;
+            #endif
 
             using (var services = ConfigureServices())
             {
                 var __client = services.GetRequiredService<DiscordSocketClient>(); //Create a new client in the Client Variable
 
                 __client.Log += LogAsync;
-
-                string botToken = Resources.token;
+                string botToken;
+                if (isDebugMode)
+                {
+                    botToken = Resources.tokendev;
+                } else
+                {
+                    botToken = Resources.tokenpublish;
+                }
 
                 await __client.LoginAsync(TokenType.Bot, botToken); //Log in the bot
                 await __client.StartAsync(); //Start the bot

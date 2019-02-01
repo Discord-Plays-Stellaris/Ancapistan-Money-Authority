@@ -9,9 +9,10 @@ namespace VIR.Modules.Objects.Company
         public int salary;
         public int wage;
         public int wageEarned;
+        public string mainCorp;
         public Employee()
         {
-
+            mainCorp = null;
         }
         public Employee(JObject obj)
         {
