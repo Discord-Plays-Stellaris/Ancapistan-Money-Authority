@@ -26,18 +26,26 @@ namespace VIR.Services
             return _database.getJObjectAsync(id, "resources").Result;
         }
 
+        public class TransactionToBeExecutedOnceChecked
+        {
+            public string IdBuyer;
+            public string IdSeller;
+            public ulong Amount;
+            public double PricePerUnit;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="type">Type of resource</param>
         /// <param name="idBuyer">Id of the buyer</param>
         /// <param name="amount">Amount of resources to be bought</param>
-        /// <param name="isCompany">Whether or not the buyer is a company</param>
         /// <returns></returns>
-        public ResourceTransferResult BuyResourceFromMarket(string type, string idBuyer, ulong amount, bool isCompany)
+        public ResourceTransferResult BuyResourceFromMarket(string type, string idBuyer, ulong amount)
         {
             var openListingsJson = _database.getJObjects("resource_market_listings").Result.ToList();
             var openListings = new List<ResourceMarketListing>();
+            var TransactionBuffer = new List<TransactionToBeExecutedOnceChecked>();
 
             foreach (var olJson in openListingsJson)
             {
@@ -64,7 +72,7 @@ namespace VIR.Services
                         totalSpent += totalPrice;
                         listing.Amount -= amount;
                         _database.SetJObjectAsync(listing.SerializeIntoJObject(), "resource_market_listings");
-                        InformSellerOfSale(listing.IdSeller, idBuyer, amount, totalPrice);
+                        InformSellerOfSale(listing, idBuyer, amount, totalPrice);
                         //add money stuff here
                         //finish return thing
                         return new ResourceTransferResult();
@@ -75,7 +83,7 @@ namespace VIR.Services
                         totalResourcesBought += amount;
                         totalSpent += totalPrice;
                         _database.RemoveObjectAsync(listing.Id, "resource_market_listings");
-                        InformSellerOfSale(listing.IdSeller, idBuyer, amount, totalPrice);
+                        InformSellerOfSale(listing, idBuyer, amount, totalPrice);
                         //add money stuff here
                         //finish return thing
                         return new ResourceTransferResult();
@@ -87,7 +95,7 @@ namespace VIR.Services
                         totalSpent += totalPrice;
                         amount -= listing.Amount;
                         _database.RemoveObjectAsync(listing.Id, "resource_market_listings");
-                        InformSellerOfSale(listing.IdSeller, idBuyer, amount, totalPrice);
+                        InformSellerOfSale(listing, idBuyer, amount, totalPrice);
                         //add money stuff here
                         //finish return thing
                         return new ResourceTransferResult();
@@ -109,12 +117,14 @@ namespace VIR.Services
             }
         }
 
-        public ResourceTransferResult BuyResourceFromSpecificOfferOnMarket()
+
+
+        public ResourceTransferResult BuyResourcesFromSpecificOfferOnMarket(string idListing, ulong amount)
         {
 
         }
 
-        private void InformSellerOfSale(string idSeller, string idBuyer, ulong amount, double totalPrice)
+        private void InformSellerOfSale(ResourceMarketListing listing, string idBuyer, ulong amount, double totalPrice)
         {
 
         }
