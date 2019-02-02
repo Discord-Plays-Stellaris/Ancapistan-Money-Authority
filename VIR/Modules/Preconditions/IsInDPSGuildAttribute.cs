@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using System;
 using System.Threading.Tasks;
+using VIR.Properties;
 
 namespace VIR.Modules.Preconditions
 {
@@ -9,7 +10,12 @@ namespace VIR.Modules.Preconditions
         //TODO: Comment Me pls
         public async override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
-            if(context.Guild.Id.Equals(481865251688808469) || context.Guild.Id.Equals(498512980284276746) || context.Guild.Id.Equals(463607272191295489) || context.Guild.Id.Equals(454357669495701514))
+            ulong guild;
+            guild = ulong.Parse(Resources.guild);
+            #if DEBUG
+            guild = ulong.Parse(Resources.devguild);
+            #endif
+            if(context.Guild.Id.Equals(guild))
             {
                 return PreconditionResult.FromSuccess();
             } else

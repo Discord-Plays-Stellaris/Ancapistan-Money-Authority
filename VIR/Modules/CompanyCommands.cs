@@ -11,6 +11,7 @@ using VIR.Modules.Preconditions;
 using VIR.Services;
 using VIR.Objects;
 using VIR.Objects.Company;
+using VIR.Properties;
 
 namespace VIR.Modules
 {
@@ -23,6 +24,7 @@ namespace VIR.Modules
         private readonly DataBaseHandlingService dataBaseService;
         private readonly CommandHandlingService CommandService;
         private readonly StockMarketService MarketService;
+        private readonly ulong guild;
         public readonly List<int> r = new List<int> { 4, 5, 6, 7 };
         public readonly List<int> w = new List<int> { 2, 3, 6, 7 };
         public readonly List<int> e = new List<int> { 1, 3, 5, 7 };
@@ -33,11 +35,16 @@ namespace VIR.Modules
             dataBaseService = db;
             CommandService = comm;
             MarketService = markserv;
+            guild = ulong.Parse(Resources.guild);
+            #if DEBUG
+            guild = ulong.Parse(Resources.devguild);
+            #endif
         }
 
         [Command("createcompany")]
         [Alias("createcorporation", "addcompany", "addcorporation")]
         [HasMasterOfBots]
+        [IsInDPSGuild]
         public async Task CreateCompanyTask(IUser CEO, string ticker, [Remainder]string name)
         {
             Company company = new Company();
@@ -65,13 +72,13 @@ namespace VIR.Modules
             JObject user = await dataBaseService.getJObjectAsync(Context.User.Id.ToString(), "users");
             Collection<string> corps = new Collection<string>();
             try {
-                foreach (string x in (Array)user["corps"])
+                foreach (string x in user["corps"].ToArray())
                 {
                     corps.Add(x);
                 }
             } catch { }
             corps.Add(ticker);
-            await dataBaseService.SetFieldAsync(Context.User.Id.ToString(), "corps", JArray.FromObject(corps.ToArray()), "users");
+            await dataBaseService.SetFieldAsync(Context.User.Id.ToString(), "corps", corps, "users");
             await ReplyAsync("Company successfully created!");
         }
 
@@ -269,7 +276,7 @@ namespace VIR.Modules
             Collection<string> corps = new Collection<string>();
             try
             {
-                foreach (string x in (Array)user["corps"])
+                foreach (string x in user["corps"].ToArray())
                 {
                     corps.Add(x);
                 }
@@ -277,6 +284,14 @@ namespace VIR.Modules
             catch { }
             corps.Add(ticker);
             await dataBaseService.SetFieldAsync(Context.User.Id.ToString(), "corps", JArray.FromObject(corps.ToArray()), "users");
+            if(((string) await dataBaseService.GetFieldAsync(Context.User.Id.ToString(), "maincorp", "users")) == null)
+            {
+                await dataBaseService.SetFieldAsync(Context.User.ToString(), "maincorp", ticker, "users");
+                if (company.role != null)
+                {
+                    await Context.Client.GetGuild(guild).GetUser(Context.User.Id).AddRoleAsync(Context.Client.GetGuild(guild).GetRole(ulong.Parse(company.role))); //481865251688808469
+                }
+            }
             await CompanyService.setCompany(company);
             await ReplyAsync($"You are now part of {company.name}!");
         }
@@ -315,6 +330,89 @@ namespace VIR.Modules
             company.employee[user.Id.ToString()].wage = wage;
             await CompanyService.setCompany(company);
             await ReplyAsync("Employee modified successfully.");
+        }
+
+        [Command("bindrole")]
+        [Summary("Binds a role to a corp membership.")]
+        [HasMasterOfBots]
+        public async Task bindRole([Summary("The ticker of the target company")]string ticker, [Summary("Role to bind")]IRole rrole)
+        {
+            Company company = await CompanyService.getCompany(ticker);
+            company.role = rrole.Id.ToString();
+            foreach (Employee x in company.employee.Values)
+            {
+                if (((string)await dataBaseService.GetFieldAsync(x.userID, "maincorp", "users")) == ticker)
+                {
+                    await Context.Guild.GetUser(ulong.Parse(x.userID)).AddRoleAsync(Context.Guild.GetRole(ulong.Parse(company.role)));
+                }
+            }
+            await CompanyService.setCompany(company);
+            await ReplyAsync("Role been bound.");
+        }
+        [Command("unbindrole")]
+        [Summary("Unbinds a role to a corp membership.")]
+        [HasMasterOfBots]
+        public async Task unbindRole([Summary("The ticker of the target company")]string ticker)
+        {
+            Company company = await CompanyService.getCompany(ticker);
+            foreach(Employee x in company.employee.Values)
+            {
+                await Context.Guild.GetUser(ulong.Parse(x.userID)).RemoveRoleAsync(Context.Guild.GetRole(ulong.Parse(company.role)));
+            }
+            company.role = null;
+            await CompanyService.setCompany(company);
+            await ReplyAsync("Role been unbound.");
+        }
+        [Command("employed")]
+        [Summary("Gets a list of companies you are employed in.")]
+        public async Task employedList()
+        {
+            JObject user = await dataBaseService.getJObjectAsync(Context.User.Id.ToString(), "users");
+            Collection<string> corps = new Collection<string>();
+            foreach (string x in user["corps"].ToArray())
+            {
+                corps.Add(x);
+            }
+            EmbedBuilder embed = new EmbedBuilder().WithColor(Color.Orange).WithTitle($"Corporations which currently employ {Context.Guild.GetUser(Context.User.Id).Nickname}").WithDescription($"Total of {corps.Count} corps");
+            foreach(string x in corps)
+            {
+                Company comp = await CompanyService.getCompany(x);
+                embed.AddField(new EmbedFieldBuilder().WithName(comp.name).WithValue(comp.employee[Context.User.Id.ToString()].position.name));
+            }
+            await ReplyAsync(null, false, embed.Build());
+        }
+        [Command("pickmaincorporation")]
+        [Summary("Picks a main corporation(among the ones you are in)")]
+        public async Task pickMainCorp([Summary("Company Ticker")] string ticker)
+        {
+            JObject user = await dataBaseService.getJObjectAsync(Context.User.Id.ToString(), "users");
+            Collection<string> corps = new Collection<string>();
+            foreach (string x in user["corps"].ToArray())
+            {
+                corps.Add(x);
+            }
+            if(!corps.Contains(ticker))
+            {
+                await ReplyAsync("You cannot make a corp you are not part of your main!");
+            } else
+            {
+                if(user["maincorp"] != null)
+                {
+                    Company comp2 = await CompanyService.getCompany((string)user["maincorp"]);
+                    if (comp2.role != null)
+                        await Context.Client.GetGuild(guild).GetUser(Context.User.Id).RemoveRoleAsync(Context.Client.GetGuild(guild).GetRole(ulong.Parse(comp2.role)));
+                    if (comp2.employee[Context.User.Id.ToString()].position.name == "CEO")
+                        await Context.Client.GetGuild(guild).GetUser(Context.User.Id).RemoveRoleAsync(Context.Client.GetGuild(guild).GetRole((ulong)533379268906975232));
+                }
+                user["maincorp"] = ticker;
+                await dataBaseService.SetJObjectAsync(user, "users");
+                Company company = await CompanyService.getCompany(ticker);
+                if(company.role != null)
+                    await Context.Client.GetGuild(guild).GetUser(Context.User.Id).AddRoleAsync(Context.Client.GetGuild(guild).GetRole(ulong.Parse(company.role)));
+                if(company.employee[Context.User.Id.ToString()].position.name == "CEO")
+                    await Context.Client.GetGuild(guild).GetUser(Context.User.Id).AddRoleAsync(Context.Client.GetGuild(guild).GetRole((ulong)533379268906975232));
+                await ReplyAsync("Main Corporation set to " + ticker);
+            }
         }
     }
 }
