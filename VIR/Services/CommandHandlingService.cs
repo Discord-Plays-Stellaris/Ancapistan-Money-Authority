@@ -91,24 +91,24 @@ namespace VIR.Services
         }
 
         /// <summary>
-        /// Posts a message to the specified channel
+        /// Posts a message to the specified channel, and returns the ID of the message.
         /// </summary>
         /// <param name="channel">The channel to post the message in</param>
         /// <param name="message">The message to be posted.</param>
         /// <returns></returns>
-        public async Task PostMessageTask(string channel, string message)
+        public async Task<Discord.Rest.RestUserMessage> PostMessageTask(string channel, string message)
         {
-            await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync(message);
+            return await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync(message);
         }
 
         /// <summary>
-        /// Posts an embed to the specified channel
+        /// Posts an embed to the specified channel, and returns the ID of the message.
         /// </summary>
         /// <param name="channel">The channel to post the message in</param>
         /// <param name="embed">The embed to be posted.</param>
-        public async Task PostEmbedTask(string channel, Embed embed)
+        public async Task<Discord.Rest.RestUserMessage> PostEmbedTask(string channel, Embed embed)
         {
-            await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync("", false, embed);
+            return await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync("", false, embed);
         }
 
         ///<summary>

@@ -63,7 +63,7 @@ namespace VIR.Modules
             channel = channel.Remove(channel.Length - 1, 1);
             channel = channel.Remove(0, 2);
 
-            StockMarketChannel channelObj = new StockMarketChannel(channel);
+            StockMarketChannel channelObj = new StockMarketChannel(channel,Context.Guild.Id.ToString());
             JObject JSONChannel = db.SerializeObject<StockMarketChannel>(channelObj);
             await db.SetJObjectAsync(JSONChannel, "system");
 
@@ -113,7 +113,7 @@ namespace VIR.Modules
             }
 
             await MarketService.SetShares(tickerOwner, tickerShare, Convert.ToInt32(amount));
-            await ReplyAsync($"<@{tickerOwner}>'s shares in {tickerShare} set to {amount}");
+            await ReplyAsync($"{tickerOwner}'s shares in {tickerShare} set to {amount}");
         }
 
         [Command("accept")]
@@ -198,6 +198,9 @@ namespace VIR.Modules
                         await db.SetFieldAsync(Context.User.Id.ToString(), "money", userMoney, "users");
                         await db.SetFieldAsync(transaction.author, "money", authorMoney, "users");
                         await db.RemoveObjectAsync(offerID, "transactions");
+
+                        ITextChannel chnl = (ITextChannel)await Context.Client.GetChannelAsync((UInt64)await db.GetFieldAsync("MarketChannel", "channel", "system"));
+                        await chnl.DeleteMessageAsync(transaction.messageID);
 
                         await ReplyAsync("Transaction complete!");
                         await CommandService.PostMessageTask((string)await db.GetFieldAsync("MarketChannel", "channel", "system"), $"<@{transaction.author}>'s Transaction with ID {transaction.id} has been accepted by <@{Context.User.Id}>!");
