@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace VIR.Objects
         public string id;
         public string channel;
 
-        public StockMarketChannel(string _channel)
+        public StockMarketChannel(string _channel, string _server)
         {
             id = "MarketChannel";
             channel = _channel;
@@ -55,6 +56,7 @@ namespace VIR.Objects
         public string type; // buy, sell, private
         public string author;
         public string ticker;
+        public ulong messageID; 
 
 
         public Transaction(JObject JSONInput)
@@ -65,6 +67,7 @@ namespace VIR.Objects
             type = (string)JSONInput["type"];
             author = (string)JSONInput["author"];
             ticker = (string)JSONInput["ticker"];
+            messageID = (ulong)JSONInput["messageID"];
         }
 
         /// <summary>
@@ -76,7 +79,7 @@ namespace VIR.Objects
         /// <param name="_author">The user who initiated the transaction</param>
         /// <param name="_ticker">The ticker of the company who's shares are being traded</param>
         /// <param name="db">A DataBaseHandlingService object</param>
-        /// <param name="command">A CommandHandlingService object</param>
+        /// <param name="command">A CommandHandlingService object</param>77
         public Transaction(double _price, int _shares, string _type, string _author, string _ticker, DataBaseHandlingService db, CommandHandlingService command)
         {
             price = _price;
@@ -84,8 +87,9 @@ namespace VIR.Objects
             type = _type;
             author = _author;
             ticker = _ticker;
+            messageID = 0;
 
-           LodgeTransactionTask(db, command);
+            LodgeTransactionTask(db, command);
 
         }
 
@@ -99,7 +103,8 @@ namespace VIR.Objects
 
             EmbedBuilder emb = new EmbedBuilder().WithTitle("Stock Market Offer").WithDescription($"Use the command `&accept {id.ToString()}` to accept this offer.").WithFooter($"Transaction ID: {id.ToString()}").AddField(typeField).AddField(companyField).AddField(amountField).AddField(priceField).AddField(totalPriceField).WithColor(Color.Green);
 
-            await CommandService.PostEmbedTask((string)await db.GetFieldAsync("MarketChannel","channel","system"), emb.Build());
+            Discord.Rest.RestUserMessage message = await CommandService.PostEmbedTask((string)await db.GetFieldAsync("MarketChannel","channel","system"), emb.Build());
+            messageID = message.Id;
         }
     }
 
@@ -123,6 +128,37 @@ namespace VIR.Objects
 
             id = tempObj.id;
             ownedShares = tempObj.ownedShares;
+        }
+    }
+
+    public class ShareholderVote
+    {
+        public Guid id { get; private set; }
+        public Collection<string> choices { get; private set; }
+        public Dictionary<ulong,ulong> messages { get; private set; }
+        public string ticker { get; private set; }
+
+        public ShareholderVote()
+        {
+
+        }
+
+        public void NewVote(Collection<string> _choices, string _ticker, Dictionary<ulong,ulong> _messages)
+        {
+            choices = _choices;
+            ticker = _ticker;
+            messages = _messages;
+            id = Guid.NewGuid();
+        }
+
+        public void JSON(JObject input)
+        {
+            ShareholderVote temp = JsonConvert.DeserializeObject<ShareholderVote>(input.ToString());
+
+            id = temp.id;
+            choices = temp.choices;
+            ticker = temp.ticker;
+            messages = temp.messages;
         }
     }
 }

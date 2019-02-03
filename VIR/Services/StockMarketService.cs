@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Net;
 using VIR.Services;
 using VIR.Objects;
 using VIR.Modules.Objects.Company;
@@ -99,6 +101,26 @@ namespace VIR.Services
             await db.SetJObjectAsync(db.SerializeObject<Company>(company), "companies");
 
             return shares;
+        }
+
+        public async Task<Collection<ulong>> GetShareholders(string ticker)
+        {
+            Collection<string> shareholders = await db.getIDs("shares");
+            Dictionary<string, int> ownedShares;
+            Collection<ulong> corpShareholders = new Collection<ulong>();
+            
+            foreach (string ID in shareholders)
+            {
+                UserShares userShares = new UserShares(await db.getJObjectAsync(ID, "shares"), true);
+                ownedShares = userShares.ownedShares;
+
+                if (ownedShares.ContainsKey(ticker))
+                {
+                    corpShareholders.Add(Convert.ToUInt64(ID));
+                }
+            }
+
+            return corpShareholders;
         }
     }
 }
