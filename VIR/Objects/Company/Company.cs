@@ -81,5 +81,33 @@ namespace VIR.Modules.Objects.Company
             JObject jObject = JObject.Parse(JSONString);
             return jObject;
         }
+        public int CompareEmployees(Employee x, Employee y)
+        {
+            if(x.position.level > y.position.level)
+            {
+                return 1;
+            } else if(x.position.level < y.position.level)
+            {
+                return -1;
+            } else
+            {
+                return 0;
+            }
+        }
+        public int ComparePositions(Position x, Position y)
+        {
+            if (x.level > y.level)
+            {
+                return 1;
+            }
+            else if (x.level < y.level)
+            {
+                return -1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }
