@@ -66,7 +66,8 @@ namespace VIR.Modules
             foreach (string id in IDs)
             {
                 Industry industry = new Industry(await _dataBaseService.getJObjectAsync(id, "industries"));
-                EmbedFieldBuilder embedField = new EmbedFieldBuilder().WithName(industry.Id).WithValue($"Resource Produced: {industry.Type}. Yearly output: {industry.MonthlyOutput}.");
+
+                EmbedFieldBuilder embedField = new EmbedFieldBuilder().WithName(industry.Id).WithValue($"Resource Produced: {industry.Type}. Yearly output: {industry.MonthlyOutput}. Belongs to {industry.CompanyId} on planet {industry.Planet}.");
                 embed.AddField(embedField);
             }
 
@@ -96,7 +97,7 @@ namespace VIR.Modules
                 allIndustries.Add(new Industry(iJson));
             }
 
-            ownedIndustries = allIndustries.Where(x => x.Type == ticker).ToList();
+            ownedIndustries = allIndustries.Where(x => x.CompanyId == ticker).ToList();
 
             EmbedBuilder embed = new EmbedBuilder().WithTitle($"All industries owned by {ticker}.")
                 .WithDescription($"This is a list of all industries owned by the company with the ticker {ticker}.")
@@ -105,7 +106,7 @@ namespace VIR.Modules
             foreach (var x in ownedIndustries)
             {
                 var embedField = new EmbedFieldBuilder().WithName(x.Id)
-                    .WithValue($"Resource Produced: {x.Type}. Yearly output: {x.MonthlyOutput}.");
+                    .WithValue($"ID: {x.Id}. Resource Produced: {x.Type}. Yearly output: {x.MonthlyOutput}. On the planet {x.Planet}.");
                 embed.AddField(embedField);
             }
 
@@ -115,35 +116,28 @@ namespace VIR.Modules
 
         [Command("setindustries")]
         [HasMasterOfBots]
-        public async Task SetIndustriesAsync(string ticker, string industry, int amount)
+        public async Task SetIndustriesAsync(string ticker, string industryId)
         {
-            Assets OwnedIndustries;
+            Industry industry;
             try
             {
-                OwnedIndustries = new Assets(await _dataBaseService.getJObjectAsync(ticker, "assets"), true);
+                industry = new Industry(_dataBaseService.getJObjectAsync(industryId, "industries").Result);
+                
+                var companies = _dataBaseService.getIDs("companies").Result;
+                if (companies.Contains(ticker))
+                {
+                    industry.CompanyId = ticker;
+                    await ReplyAsync($"Successfully set ownership of {industryId} to {ticker}.");
+                }
+
+                await ReplyAsync($"Unable to find company with ticker {ticker}.");
             }
-            catch (System.NullReferenceException)
+            catch (Exception e)
             {
-                OwnedIndustries = new Assets(ticker);
-                await _dataBaseService.SetJObjectAsync(_dataBaseService.SerializeObject<Assets>(OwnedIndustries), "assets");
+                await ReplyAsync($"Unable to find industry with Id {industryId}.");
             }
 
-            if (OwnedIndustries.Industries.ContainsKey(industry))
-            {
-                OwnedIndustries.Industries.Remove(industry);
-            }
-
-            OwnedIndustries.Industries.Add(industry, amount);
-            if (amount != 1)
-            {
-                await ReplyAsync($"{ticker} now has {amount} {industry} industries");
-            }
-            else
-            {
-                await ReplyAsync($"{ticker} now has {amount} {industry} industry");
-            }
-
-            await _dataBaseService.SetJObjectAsync(_dataBaseService.SerializeObject<Assets>(OwnedIndustries), "assets");
+            
         }
     }
 }

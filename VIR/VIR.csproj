@@ -200,6 +200,7 @@
     <Compile Include="Modules\CompanyCommands.cs" />
     <Compile Include="Modules\DataBaseCommands.cs" />
     <Compile Include="Modules\IndustryCommands.cs" />
+    <Compile Include="Modules\ResourceCommands.cs" />
     <Compile Include="Modules\StockMarketCommands.cs" />
     <Compile Include="Objects\Company\Company.cs" />
     <Compile Include="Objects\Company\Employee.cs" />
@@ -208,10 +209,8 @@
     <Compile Include="Objects\Company\Position.cs" />
     <Compile Include="Modules\Preconditions\HasMasterOfBotsAttribute.cs" />
     <Compile Include="Modules\Preconditions\IsInDPSGuildAttribute.cs" />
-    <Compile Include="Objects\Planet.cs" />
     <Compile Include="Objects\ResourceMarketListing.cs" />
     <Compile Include="Objects\ResourceTransaction.cs" />
-    <Compile Include="Objects\ResourceTransferResult.cs" />
     <Compile Include="Objects\StockMarketObjects.cs" />
     <Compile Include="Objects\User.cs" />
     <Compile Include="Program.cs" />

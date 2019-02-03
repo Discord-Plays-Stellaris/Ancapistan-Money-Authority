@@ -20,17 +20,16 @@ namespace VIR.Modules.Objects.Company
         public Dictionary<string, Employee> employee; //Format: userid, title
         //public Dictionary<string, int> assets; //thing, amount
         public Dictionary<string, Position> positions;
-        public int money;
+        public double Money;
         public int shares;
         public double SharePrice;
         public Dictionary<string, JobOffer> jobOffers;
-        public Dictionary<string, int> industries;
         public string role;
 
         public Company()
         {
             SharePrice = 0;
-            money = 0;
+            Money = 0;
             role = null;
         }
         public Company(JObject companyDbEntry)
@@ -50,16 +49,15 @@ namespace VIR.Modules.Objects.Company
 
             id = tempObj.id;
             name = tempObj.name;
-            money = tempObj.money;
+            Money = tempObj.Money;
             shares = tempObj.shares;
             SharePrice = tempObj.SharePrice;
             employee = tempObj.employee;
             positions = tempObj.positions;
             jobOffers = tempObj.jobOffers;
             role = tempObj.role;
-            industries = tempObj.industries;
         }
-        public JObject serializeIntoJObject()
+        public JObject SerializeIntoJObject()
         {
             /*JObject temp = new JObject();
             temp["name"] = name;
