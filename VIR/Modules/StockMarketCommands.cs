@@ -510,10 +510,10 @@ namespace VIR.Modules
         [Command("endvote")]
         public async Task EndVoteTask(string guidString)
         {
-            ShareholderVote vote = new ShareholderVote();
-            vote.JSON(await db.getJObjectAsync(guidString, "votes"));
+            JObject temp = await db.getJObjectAsync(guidString, "votes");
+            ShareholderVote vote = new ShareholderVote(temp);
+            //vote.JSON(await db.getJObjectAsync(guidString, "votes"));
             Dictionary<ulong, string> votes = new Dictionary<ulong, string>(); // user, vote
-
             foreach(ulong ID in vote.messages.Keys)
             {
                 IDMChannel dmChannel = await Context.Client.GetDMChannelAsync(ID);
