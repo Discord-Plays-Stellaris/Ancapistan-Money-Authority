@@ -117,7 +117,7 @@ namespace VIR.Modules
         [HasMasterOfBots]
         public async Task SetIndustriesAsync(string ticker, string industry, int amount)
         {
-            Assets OwnedIndustries;
+            /*Assets OwnedIndustries;
             try
             {
                 OwnedIndustries = new Assets(await _dataBaseService.getJObjectAsync(ticker, "assets"), true);
@@ -143,7 +143,7 @@ namespace VIR.Modules
                 await ReplyAsync($"{ticker} now has {amount} {industry} industry");
             }
 
-            await _dataBaseService.SetJObjectAsync(_dataBaseService.SerializeObject<Assets>(OwnedIndustries), "assets");
+            await _dataBaseService.SetJObjectAsync(_dataBaseService.SerializeObject<Assets>(OwnedIndustries), "assets");*/
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 using VIR.Modules.Objects.Company;
 using VIR.Modules.Preconditions;
 using VIR.Services;
@@ -374,6 +375,158 @@ namespace VIR.Modules
 
             await ReplyAsync("Your shares have been sent to you privately");
             await Context.User.SendMessageAsync("", false, embed.Build());
+        }
+
+        [HasMasterOfBots]
+        [Command("shareholders")]
+        public async Task ShareholdersAsync(string ticker)
+        {
+            string output = $"{ticker}'s shareholders are: ";
+
+            foreach (ulong userID in await MarketService.GetShareholders(ticker))
+            {
+                IGuildUser user = await Context.Guild.GetUserAsync(userID);
+                output = output + $"<@{user.Id.ToString()}> ({await MarketService.GetShares(userID.ToString(), ticker)} shares), ";
+            }
+
+            await ReplyAsync(output);
+        }
+
+        [HasMasterOfBots]
+        [Command("shareholdervote")]
+        public async Task VoteAsync(string ticker, string description, [Remainder] string choicesInput)
+        {
+            string[] choicesArray = choicesInput.Split( new[] { ", " }, StringSplitOptions.None);
+            Collection<string> choices = new Collection<string>();
+
+            foreach (string _choice in choicesArray)
+            {
+                choices.Add(_choice);
+            }
+
+            if (choices.Count > 9)
+            {
+                await ReplyAsync("You may only have a maxiumum of 9 choices for the vote.");
+                return;
+            }
+
+            EmbedBuilder embedBuilder = new EmbedBuilder().WithTitle($"Shareholder vote for {ticker}").WithDescription(description).WithColor(Color.Red).WithFooter("If you vote for more than one option, the bot will pick a random option from the ones you picked as your vote.");
+            
+            foreach(string choice in choices)
+            {
+                string emoji = "";
+                switch (choices.IndexOf(choice))
+                {
+                    case 0:
+                        emoji = ":one:";
+                        break;
+                    case 1:
+                        emoji = ":two:";
+                        break;
+                    case 2:
+                        emoji = ":three:";
+                        break;
+                    case 3:
+                        emoji = ":four:";
+                        break;
+                    case 4:
+                        emoji = ":five:";
+                        break;
+                    case 5:
+                        emoji = ":six:";
+                        break;
+                    case 6:
+                        emoji = ":seven:";
+                        break;
+                    case 7:
+                        emoji = ":eight:";
+                        break;
+                    case 8:
+                        emoji = ":nine:";
+                        break;
+                }
+
+                EmbedFieldBuilder embedField = new EmbedFieldBuilder().WithName(choice).WithValue($"React with {emoji} to vote for '{choice}'");
+                embedBuilder.AddField(embedField);
+            }
+
+            await ReplyAsync("Sending DMs. This may take a while...");
+            Dictionary<ulong, ulong> DMs = new Dictionary<ulong, ulong>();
+
+            foreach(ulong ID in await MarketService.GetShareholders(ticker))
+            {
+                IUser user = await Context.Guild.GetUserAsync(ID);
+                IUserMessage message = await user.SendMessageAsync("", false, embedBuilder.Build());
+                foreach(string choice in choices)
+                {
+                    string emojiString = "";
+                    switch (choices.IndexOf(choice))
+                    {
+                        case 0:
+                            emojiString = "\u0031\u20E3"; // 1
+                            break;
+                        case 1:
+                            emojiString = "\u0032\u20E3"; // 2
+                            break;
+                        case 2:
+                            emojiString = "\u0033\u20E3"; // 3
+                            break;
+                        case 3:
+                            emojiString = "\u0034\u20E3"; // 4
+                            break;
+                        case 4:
+                            emojiString = "\u0035\u20E3"; // 5
+                            break;
+                        case 5:
+                            emojiString = "\u0036\u20E3"; // 6
+                            break;
+                        case 6:
+                            emojiString = "\u0037\u20E3"; // 7
+                            break;
+                        case 7:
+                            emojiString = "\u0038\u20E3"; // 8
+                            break;
+                        case 8:
+                            emojiString = "\u0039\u20E3"; // 9
+                            break;
+                    }
+
+                    IEmote emoji = new Emoji(emojiString);
+
+                    await message.AddReactionAsync(emoji);
+                }
+
+                DMs[ID] = message.Id;
+            }
+
+            ShareholderVote vote = new ShareholderVote();
+            vote.NewVote(choices, ticker, DMs);
+            await db.SetJObjectAsync(db.SerializeObject<ShareholderVote>(vote), "votes");
+            await ReplyAsync("", false, embedBuilder.Build());
+            await ReplyAsync($"Vote initiated with the above embed. Use the command `&endvote {vote.id}` to end the vote.");
+        }
+
+        [HasMasterOfBots]
+        [Command("endvote")]
+        public async Task EndVoteTask(string guidString)
+        {
+            ShareholderVote vote = new ShareholderVote();
+            vote.JSON(await db.getJObjectAsync(guidString, "votes"));
+            Dictionary<ulong, string> votes = new Dictionary<ulong, string>(); // user, vote
+
+            foreach(ulong ID in vote.messages.Keys)
+            {
+                IDMChannel dmChannel = await Context.Client.GetDMChannelAsync(ID);
+                IUserMessage message = (IUserMessage)await dmChannel.GetMessageAsync(vote.messages[ID]);
+
+                Collection<IEmote> reactionsRaw = (Collection<IEmote>)message.Reactions.Keys;
+                Collection<IEmote> reactions = new Collection<IEmote>();
+
+                foreach(IEmote reaction in reactionsRaw)
+                {
+
+                }
+            }
         }
     }
 }

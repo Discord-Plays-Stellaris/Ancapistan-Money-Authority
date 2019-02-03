@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -127,6 +128,37 @@ namespace VIR.Objects
 
             id = tempObj.id;
             ownedShares = tempObj.ownedShares;
+        }
+    }
+
+    public class ShareholderVote
+    {
+        public Guid id { get; private set; }
+        public Collection<string> choices { get; private set; }
+        public Dictionary<ulong,ulong> messages { get; private set; }
+        public string ticker { get; private set; }
+
+        public ShareholderVote()
+        {
+
+        }
+
+        public void NewVote(Collection<string> _choices, string _ticker, Dictionary<ulong,ulong> _messages)
+        {
+            choices = _choices;
+            ticker = _ticker;
+            messages = _messages;
+            id = Guid.NewGuid();
+        }
+
+        public void JSON(JObject input)
+        {
+            ShareholderVote temp = JsonConvert.DeserializeObject<ShareholderVote>(input.ToString());
+
+            id = temp.id;
+            choices = temp.choices;
+            ticker = temp.ticker;
+            messages = temp.messages;
         }
     }
 }

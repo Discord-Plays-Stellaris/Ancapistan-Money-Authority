@@ -36,7 +36,7 @@ namespace VIR.Services
         /// <returns></returns>
         public ResourceTransferResult BuyResourceFromMarket(string type, string idBuyer, ulong amount, bool isCompany)
         {
-            var openListingsJson = _database.getJObjects("resource_market_listings").Result.ToList();
+            /*var openListingsJson = _database.getJObjects("resource_market_listings").Result.ToList();
             var openListings = new List<ResourceMarketListing>();
 
             foreach (var olJson in openListingsJson)
@@ -106,12 +106,13 @@ namespace VIR.Services
             {
                 //finish return thing
                 return new ResourceTransferResult();
-            }
+            }*/
+            return new ResourceTransferResult();
         }
 
         public ResourceTransferResult BuyResourceFromSpecificOfferOnMarket()
         {
-
+            return new ResourceTransferResult();
         }
 
         private void InformSellerOfSale(string idSeller, string idBuyer, ulong amount, double totalPrice)
