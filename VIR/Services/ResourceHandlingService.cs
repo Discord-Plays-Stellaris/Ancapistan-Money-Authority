@@ -474,7 +474,7 @@ namespace VIR.Services
             return $"Successfully bought {amount} of {listing.Type} for {totalPrice} from listing {listing.Id}.";
         }
 
-        public async Task<string> PutResourceUpForSale(string idSeller, string type, ulong amount, ulong pricePerUnit)
+        public async Task<string> PutResourceUpForSale(string idSeller, string type, ulong amount, double pricePerUnit)
         {
             var resultReduce = ReduceResource(idSeller, type, amount);
             var currentYear = _database.getJObjectAsync("CurrentYear", "system").Result.GetValue("value")
@@ -509,7 +509,7 @@ namespace VIR.Services
                         amount,
                         currentYear).SerializeIntoJObject();
                     await _database.SetJObjectAsync(jsonTransactionHistory, "resource_transaction_history", true);
-                    return "Successfully added transferred resources.";
+                    return $"Successfully transferred {amount} of {type}.";
                 }
 
                 return "Managed to subtract resources but not add them.";
