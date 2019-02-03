@@ -71,5 +71,12 @@ namespace VIR.Modules
             await ReplyAsync("The help list has been DMed to you.");
             await Context.User.SendMessageAsync(null, false, embed.Build());
         }
+
+        [HasMasterOfBots]
+        [Command("echo")]
+        public async Task EchoAsync(ITextChannel channel,[Remainder] string contents)
+        {
+            await comhan.PostMessageTask(channel.Id.ToString(), contents);
+        }
     }
 }
