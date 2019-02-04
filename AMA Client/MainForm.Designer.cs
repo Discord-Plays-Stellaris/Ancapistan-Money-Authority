@@ -29,21 +29,31 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabGeneral = new System.Windows.Forms.TabPage();
+            this.tabUser = new System.Windows.Forms.TabPage();
+            this.labelCompaniesList = new System.Windows.Forms.Label();
+            this.listBoxCompanies = new System.Windows.Forms.ListBox();
+            this.labelMoney = new System.Windows.Forms.Label();
+            this.labelBalance = new System.Windows.Forms.Label();
+            this.labelUsername = new System.Windows.Forms.Label();
+            this.buttonLogIn = new System.Windows.Forms.Button();
             this.tabStockMarket = new System.Windows.Forms.TabPage();
             this.tabAbout = new System.Windows.Forms.TabPage();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.buttonLogIn = new System.Windows.Forms.Button();
             this.buttonGitHub = new System.Windows.Forms.Button();
+            this.textBoxCredits = new System.Windows.Forms.TextBox();
+            this.dataGridViewShares = new System.Windows.Forms.DataGridView();
+            this.ColumnTicker = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnSharesOwned = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
-            this.tabGeneral.SuspendLayout();
+            this.tabUser.SuspendLayout();
             this.tabAbout.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewShares)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabGeneral);
+            this.tabControl1.Controls.Add(this.tabUser);
             this.tabControl1.Controls.Add(this.tabStockMarket);
             this.tabControl1.Controls.Add(this.tabAbout);
             this.tabControl1.Location = new System.Drawing.Point(-1, 0);
@@ -52,16 +62,80 @@
             this.tabControl1.Size = new System.Drawing.Size(802, 450);
             this.tabControl1.TabIndex = 0;
             // 
-            // tabGeneral
+            // tabUser
             // 
-            this.tabGeneral.Controls.Add(this.buttonLogIn);
-            this.tabGeneral.Location = new System.Drawing.Point(4, 25);
-            this.tabGeneral.Name = "tabGeneral";
-            this.tabGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this.tabGeneral.Size = new System.Drawing.Size(794, 421);
-            this.tabGeneral.TabIndex = 0;
-            this.tabGeneral.Text = "General";
-            this.tabGeneral.UseVisualStyleBackColor = true;
+            this.tabUser.Controls.Add(this.dataGridViewShares);
+            this.tabUser.Controls.Add(this.labelCompaniesList);
+            this.tabUser.Controls.Add(this.listBoxCompanies);
+            this.tabUser.Controls.Add(this.labelMoney);
+            this.tabUser.Controls.Add(this.labelBalance);
+            this.tabUser.Controls.Add(this.labelUsername);
+            this.tabUser.Controls.Add(this.buttonLogIn);
+            this.tabUser.Location = new System.Drawing.Point(4, 25);
+            this.tabUser.Name = "tabUser";
+            this.tabUser.Padding = new System.Windows.Forms.Padding(3);
+            this.tabUser.Size = new System.Drawing.Size(794, 421);
+            this.tabUser.TabIndex = 0;
+            this.tabUser.Text = "User";
+            this.tabUser.UseVisualStyleBackColor = true;
+            // 
+            // labelCompaniesList
+            // 
+            this.labelCompaniesList.AutoSize = true;
+            this.labelCompaniesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCompaniesList.Location = new System.Drawing.Point(13, 107);
+            this.labelCompaniesList.Name = "labelCompaniesList";
+            this.labelCompaniesList.Size = new System.Drawing.Size(92, 17);
+            this.labelCompaniesList.TabIndex = 5;
+            this.labelCompaniesList.Text = "Companies:";
+            // 
+            // listBoxCompanies
+            // 
+            this.listBoxCompanies.FormattingEnabled = true;
+            this.listBoxCompanies.ItemHeight = 16;
+            this.listBoxCompanies.Location = new System.Drawing.Point(13, 130);
+            this.listBoxCompanies.Name = "listBoxCompanies";
+            this.listBoxCompanies.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.listBoxCompanies.Size = new System.Drawing.Size(199, 276);
+            this.listBoxCompanies.TabIndex = 4;
+            // 
+            // labelMoney
+            // 
+            this.labelMoney.AutoSize = true;
+            this.labelMoney.Location = new System.Drawing.Point(10, 50);
+            this.labelMoney.Name = "labelMoney";
+            this.labelMoney.Size = new System.Drawing.Size(111, 17);
+            this.labelMoney.TabIndex = 3;
+            this.labelMoney.Text = "Balance: $00.00";
+            // 
+            // labelBalance
+            // 
+            this.labelBalance.AutoSize = true;
+            this.labelBalance.Location = new System.Drawing.Point(10, 33);
+            this.labelBalance.Name = "labelBalance";
+            this.labelBalance.Size = new System.Drawing.Size(141, 17);
+            this.labelBalance.TabIndex = 2;
+            this.labelBalance.Text = "Personal Influence: 0";
+            // 
+            // labelUsername
+            // 
+            this.labelUsername.AutoSize = true;
+            this.labelUsername.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelUsername.Location = new System.Drawing.Point(7, 4);
+            this.labelUsername.Name = "labelUsername";
+            this.labelUsername.Size = new System.Drawing.Size(202, 29);
+            this.labelUsername.TabIndex = 1;
+            this.labelUsername.Text = "Username#0000";
+            // 
+            // buttonLogIn
+            // 
+            this.buttonLogIn.Location = new System.Drawing.Point(710, 7);
+            this.buttonLogIn.Name = "buttonLogIn";
+            this.buttonLogIn.Size = new System.Drawing.Size(75, 34);
+            this.buttonLogIn.TabIndex = 0;
+            this.buttonLogIn.Text = "Log In";
+            this.buttonLogIn.UseVisualStyleBackColor = true;
+            this.buttonLogIn.Click += new System.EventHandler(this.buttonLogIn_Click);
             // 
             // tabStockMarket
             // 
@@ -76,34 +150,13 @@
             // tabAbout
             // 
             this.tabAbout.Controls.Add(this.buttonGitHub);
-            this.tabAbout.Controls.Add(this.textBox1);
+            this.tabAbout.Controls.Add(this.textBoxCredits);
             this.tabAbout.Location = new System.Drawing.Point(4, 25);
             this.tabAbout.Name = "tabAbout";
             this.tabAbout.Size = new System.Drawing.Size(794, 421);
             this.tabAbout.TabIndex = 2;
             this.tabAbout.Text = "About";
             this.tabAbout.UseVisualStyleBackColor = true;
-            // 
-            // textBox1
-            // 
-            this.textBox1.BackColor = System.Drawing.Color.White;
-            this.textBox1.Location = new System.Drawing.Point(10, 4);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(775, 409);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.Text = resources.GetString("textBox1.Text");
-            // 
-            // buttonLogIn
-            // 
-            this.buttonLogIn.Location = new System.Drawing.Point(710, 7);
-            this.buttonLogIn.Name = "buttonLogIn";
-            this.buttonLogIn.Size = new System.Drawing.Size(75, 34);
-            this.buttonLogIn.TabIndex = 0;
-            this.buttonLogIn.Text = "Log In";
-            this.buttonLogIn.UseVisualStyleBackColor = true;
-            this.buttonLogIn.Click += new System.EventHandler(this.buttonLogIn_Click);
             // 
             // buttonGitHub
             // 
@@ -115,6 +168,53 @@
             this.buttonGitHub.UseVisualStyleBackColor = true;
             this.buttonGitHub.Click += new System.EventHandler(this.buttonGitHub_Click);
             // 
+            // textBoxCredits
+            // 
+            this.textBoxCredits.BackColor = System.Drawing.Color.White;
+            this.textBoxCredits.Location = new System.Drawing.Point(10, 4);
+            this.textBoxCredits.Multiline = true;
+            this.textBoxCredits.Name = "textBoxCredits";
+            this.textBoxCredits.ReadOnly = true;
+            this.textBoxCredits.Size = new System.Drawing.Size(775, 409);
+            this.textBoxCredits.TabIndex = 0;
+            this.textBoxCredits.Text = resources.GetString("textBoxCredits.Text");
+            // 
+            // dataGridViewShares
+            // 
+            this.dataGridViewShares.AllowUserToAddRows = false;
+            this.dataGridViewShares.AllowUserToDeleteRows = false;
+            this.dataGridViewShares.AllowUserToResizeColumns = false;
+            this.dataGridViewShares.AllowUserToResizeRows = false;
+            this.dataGridViewShares.BackgroundColor = System.Drawing.Color.White;
+            this.dataGridViewShares.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridViewShares.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.dataGridViewShares.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewShares.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ColumnTicker,
+            this.ColumnSharesOwned});
+            this.dataGridViewShares.Location = new System.Drawing.Point(219, 130);
+            this.dataGridViewShares.Name = "dataGridViewShares";
+            this.dataGridViewShares.RowHeadersVisible = false;
+            this.dataGridViewShares.RowTemplate.Height = 24;
+            this.dataGridViewShares.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.dataGridViewShares.Size = new System.Drawing.Size(240, 276);
+            this.dataGridViewShares.TabIndex = 6;
+            // 
+            // ColumnTicker
+            // 
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ColumnTicker.DefaultCellStyle = dataGridViewCellStyle2;
+            this.ColumnTicker.HeaderText = "Ticker";
+            this.ColumnTicker.Name = "ColumnTicker";
+            this.ColumnTicker.ToolTipText = "The ticker of the company in which you own shares.";
+            // 
+            // ColumnSharesOwned
+            // 
+            this.ColumnSharesOwned.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.ColumnSharesOwned.HeaderText = "Shares Owned";
+            this.ColumnSharesOwned.Name = "ColumnSharesOwned";
+            this.ColumnSharesOwned.Width = 130;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -125,9 +225,11 @@
             this.Name = "MainForm";
             this.Text = "Ancapistan Money Authority";
             this.tabControl1.ResumeLayout(false);
-            this.tabGeneral.ResumeLayout(false);
+            this.tabUser.ResumeLayout(false);
+            this.tabUser.PerformLayout();
             this.tabAbout.ResumeLayout(false);
             this.tabAbout.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewShares)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -135,11 +237,19 @@
         #endregion
 
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabGeneral;
+        private System.Windows.Forms.TabPage tabUser;
         private System.Windows.Forms.TabPage tabStockMarket;
         private System.Windows.Forms.TabPage tabAbout;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBoxCredits;
         private System.Windows.Forms.Button buttonLogIn;
         private System.Windows.Forms.Button buttonGitHub;
+        private System.Windows.Forms.Label labelUsername;
+        private System.Windows.Forms.Label labelMoney;
+        private System.Windows.Forms.Label labelBalance;
+        private System.Windows.Forms.ListBox listBoxCompanies;
+        private System.Windows.Forms.Label labelCompaniesList;
+        private System.Windows.Forms.DataGridView dataGridViewShares;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnTicker;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnSharesOwned;
     }
 }

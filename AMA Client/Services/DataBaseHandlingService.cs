@@ -21,7 +21,7 @@ namespace AMA_Client.Services
         {
             try
             {
-                conn = r.Connection().Hostname("127.2.0.1").Timeout(60).Connect();
+                conn = r.Connection().Hostname("127.0.0.1").Timeout(60).Connect();
             } catch(Exception e)
             {
                 Error.Throw("A connection to the database could not be established. This may be due to a bad internet connection, or the database may be down.");
@@ -112,9 +112,9 @@ namespace AMA_Client.Services
         /// <param name="id">The ID of the document</param>
         /// <param name="tableName">The table of the document</param>
         /// <returns>A JObject</returns>
-        public static async Task<JObject> getJObjectAsync(string id, string tableName)
+        public static JObject getJObject(string id, string tableName)
         {
-            return await r.Db("root").Table(tableName).Get(id).RunAsync(conn);
+            return r.Db("root").Table(tableName).Get(id).Run(conn);
         }
 
         /// <summary>

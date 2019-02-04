@@ -7,7 +7,7 @@
     <ProjectGuid>{D0EFC351-600D-4D4C-98D1-550E257F3093}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>VIR</RootNamespace>
-    <AssemblyName>VIR Server</AssemblyName>
+    <AssemblyName>AMA Server</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -38,7 +38,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\VIR Server.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\AMA Server.xml</DocumentationFile>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -51,7 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>VIR.ico</ApplicationIcon>
+    <ApplicationIcon>ama.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="netstandard" />
@@ -243,6 +243,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ama.ico" />
     <Content Include="VIR.ico" />
   </ItemGroup>
   <ItemGroup>
