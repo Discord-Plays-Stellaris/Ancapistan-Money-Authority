@@ -26,7 +26,18 @@ namespace VIR.Services
 
         public JObject GetResources(string id)
         {
-            return _database.getJObjectAsync(id, "resources").Result;
+            JObject resources;
+            try
+            {
+                resources = _database.getJObjectAsync(id, "resources").Result;
+            }
+            catch (Exception e)
+            {
+                resources = new Resource(id).SerializeIntoJObject();
+                SetResources(resources);
+            }
+
+            return resources;
         }
 
         public class TransactionToBeExecutedOnceChecked
@@ -150,7 +161,7 @@ namespace VIR.Services
             // does the monetary transactions
             foreach (var x in transactionBuffer)
             {
-                if (x.IdSeller.Length > 17)
+                if (x.IdSeller.Length <=3)
                 {
                     var seller = new Company(_database.getJObjectAsync(x.IdSeller, "companies").Result);
                     seller.Money += (x.Amount * x.PricePerUnit);
@@ -302,7 +313,7 @@ namespace VIR.Services
             // does the monetary transactions
             foreach (var x in transactionBuffer)
             {
-                if (x.IdSeller.Length > 17)
+                if (x.IdSeller.Length <= 3)
                 {
                     var seller = new Company(_database.getJObjectAsync(x.IdSeller, "companies").Result);
                     seller.Money += (x.Amount * x.PricePerUnit);
@@ -391,7 +402,7 @@ namespace VIR.Services
             }
 
             // doing the money stuff
-            if (listing.IdSeller.Length > 17)
+            if (listing.IdSeller.Length <=3)
             {
                 var seller = new Company(_database.getJObjectAsync(listing.IdSeller, "companies").Result);
                 seller.Money += (listing.Amount * listing.Price);
@@ -455,7 +466,7 @@ namespace VIR.Services
             }
 
             // doing the money stuff
-            if (listing.IdSeller.Length > 17)
+            if (listing.IdSeller.Length <=3)
             {
                 var seller = new Company(_database.getJObjectAsync(listing.IdSeller, "companies").Result);
                 seller.Money += (listing.Amount * listing.Price);

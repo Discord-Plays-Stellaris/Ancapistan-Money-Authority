@@ -67,6 +67,7 @@ namespace VIR
                 .AddSingleton<CompanyService>()
                 .AddSingleton<StockMarketService>() // Methods and shit for the Stock Market. #bestservice
                 .AddSingleton<ResourceHandlingService>()
+                .AddSingleton<IndustryService>()
                 .BuildServiceProvider();
         }
     }

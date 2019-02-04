@@ -20,13 +20,26 @@ namespace VIR.Modules
         private readonly DataBaseHandlingService _dataBaseService;
         private readonly CommandHandlingService _commandService;
         private readonly StockMarketService _marketService;
+        private readonly IndustryService _industryService;
 
-        public IndustryCommands(CompanyService com, DataBaseHandlingService db, CommandHandlingService comm, StockMarketService markserv)
+        public IndustryCommands(IndustryService ind, CompanyService com, DataBaseHandlingService db, CommandHandlingService comm, StockMarketService markserv)
         {
             _companyService = com;
             _dataBaseService = db;
             _commandService = comm;
             _marketService = markserv;
+            _industryService = ind;
+        }
+
+        [Command("work")]
+        public async Task WorkAtIndustry(string industryId, int utilSpent)
+        {
+            var response = _industryService.WorkAtIndustryForUtils(industryId, utilSpent, Context.User.Id.ToString());
+        }
+
+        public async Task SellIndustryTo(string industryId, string companyToSellToId, double price)
+        {
+
         }
 
         //done
@@ -136,8 +149,6 @@ namespace VIR.Modules
             {
                 await ReplyAsync($"Unable to find industry with Id {industryId}.");
             }
-
-            
         }
     }
 }

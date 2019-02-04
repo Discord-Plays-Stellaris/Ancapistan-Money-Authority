@@ -15,8 +15,9 @@ namespace VIR.Objects
         public int Age; // Age of the player
         public int PP; // PP hehe
         public string MainCompany; // Primary company of the user, three letter ticket
+        public int Utils; // default max 100
 
-        public User(string id, double money, int age, int pp, string mainCompany)
+        public User(string id, double money, int age, int pp, string mainCompany, int Utils)
         {
             Id = id;
             Money = money;
@@ -32,6 +33,7 @@ namespace VIR.Objects
             Age = (int) dbInput["age"];
             PP = (int) dbInput["pp"];
             MainCompany = (string) dbInput["maincompany"];
+            Utils = (int) dbInput["utils"];
         }
 
         public JObject SerializeIntoJObject()
