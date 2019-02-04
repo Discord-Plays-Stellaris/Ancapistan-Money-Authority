@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using VIR.Modules.Objects.Company;
@@ -23,7 +22,7 @@ namespace VIR.Services
         }
         public async Task setCompany(Company company)
         {
-            await __database.SetJObjectAsync(company.serializeIntoJObject(), "companies");
+            await __database.SetJObjectAsync(company.SerializeIntoJObject(), "companies");
         }
         public async Task<Collection<Company>> findEmployee(IUser user)
         {

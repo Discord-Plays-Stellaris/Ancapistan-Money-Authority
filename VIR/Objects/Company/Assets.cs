@@ -11,7 +11,8 @@ namespace VIR.Objects.Company
 {
     class Industry
     {
-        public string Id; // Ticker
+        public string Id; // Id
+        public string CompanyId; // Company ticker
         public string Type; /* What resource this industry produces 
                             MNRL - Minerals
                             FOOD - Food
@@ -22,15 +23,16 @@ namespace VIR.Objects.Company
                             */
         public ulong MonthlyOutput; // Output of resources per year
         public int Utils; // Amount of Utils the industry has left to spend (max 100)
-        public string PlanetId; // What planet the industry is on
+        public string Planet; // What planet the industry is on
 
-        public Industry(string id, string type, ulong monthlyOutput, int utils, string planetId)
+        public Industry(string id, string type, ulong monthlyOutput, int utils, string planet)
         {
             Id = id;
+            CompanyId = "";
             Type = type;
             MonthlyOutput = monthlyOutput;
             Utils = utils;
-            PlanetId = planetId;
+            Planet = planet;
         }
 
         public Industry(JObject dbInput)
@@ -39,7 +41,7 @@ namespace VIR.Objects.Company
             Type = (string)dbInput["type"];
             MonthlyOutput = (ulong)dbInput["monthlyOutput"];
             Utils = (int) dbInput["utils"];
-            PlanetId = (string) dbInput["planetId"];
+            Planet = (string) dbInput["planet"];
         }
 
         public JObject SerializeIntoJObject()

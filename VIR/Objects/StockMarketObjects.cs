@@ -87,13 +87,11 @@ namespace VIR.Objects
             type = _type;
             author = _author;
             ticker = _ticker;
-            messageID = 0;
-
-            LodgeTransactionTask(db, command);
+            messageID = LodgeTransactionTask(db, command).GetAwaiter().GetResult();
 
         }
 
-        private async Task LodgeTransactionTask(DataBaseHandlingService db, CommandHandlingService CommandService)
+        private async Task<ulong> LodgeTransactionTask(DataBaseHandlingService db, CommandHandlingService CommandService)
         {
             EmbedFieldBuilder typeField = new EmbedFieldBuilder().WithIsInline(true).WithName("Type:").WithValue($"Looking to {type} shares");
             EmbedFieldBuilder companyField = new EmbedFieldBuilder().WithIsInline(true).WithName("Company:").WithValue(await db.GetFieldAsync(ticker, "name", "companies"));
@@ -104,7 +102,7 @@ namespace VIR.Objects
             EmbedBuilder emb = new EmbedBuilder().WithTitle("Stock Market Offer").WithDescription($"Use the command `&accept {id.ToString()}` to accept this offer.").WithFooter($"Transaction ID: {id.ToString()}").AddField(typeField).AddField(companyField).AddField(amountField).AddField(priceField).AddField(totalPriceField).WithColor(Color.Green);
 
             Discord.Rest.RestUserMessage message = await CommandService.PostEmbedTask((string)await db.GetFieldAsync("MarketChannel","channel","system"), emb.Build());
-            messageID = message.Id;
+            return message.Id;
         }
     }
 
@@ -133,14 +131,24 @@ namespace VIR.Objects
 
     public class ShareholderVote
     {
-        public Guid id { get; private set; }
-        public Collection<string> choices { get; private set; }
-        public Dictionary<ulong,ulong> messages { get; private set; }
-        public string ticker { get; private set; }
+        public Guid id { get; set; }
+        public Collection<string> choices { get; set; }
+        public Dictionary<ulong,ulong> messages { get; set; }
+        public string ticker { get; set; }
 
         public ShareholderVote()
         {
 
+        }
+
+        public ShareholderVote(JObject input)
+        {
+            ShareholderVote temp = JsonConvert.DeserializeObject<ShareholderVote>(input.ToString());
+
+            id = temp.id;
+            choices = temp.choices;
+            ticker = temp.ticker;
+            messages = temp.messages;
         }
 
         public void NewVote(Collection<string> _choices, string _ticker, Dictionary<ulong,ulong> _messages)
@@ -151,7 +159,7 @@ namespace VIR.Objects
             id = Guid.NewGuid();
         }
 
-        public void JSON(JObject input)
+        /*public void JSON(JObject input)
         {
             ShareholderVote temp = JsonConvert.DeserializeObject<ShareholderVote>(input.ToString());
 
@@ -159,6 +167,6 @@ namespace VIR.Objects
             choices = temp.choices;
             ticker = temp.ticker;
             messages = temp.messages;
-        }
+        }*/
     }
 }

@@ -431,7 +431,7 @@ namespace VIR.Modules
             request.salary = salary;
             request.user = Context.User.Id.ToString();
             string id = Guid.NewGuid().ToString();
-            if(company.jobRequests == null)
+            if (company.jobRequests == null)
             {
                 company.jobRequests = new Dictionary<string, JobRequest>();
             }
@@ -559,17 +559,122 @@ namespace VIR.Modules
                             await ReplyAsync($"{user.Username} has been fired from {company.name}");
                             await user.GetOrCreateDMChannelAsync().GetAwaiter().GetResult().SendMessageAsync($"You have been fired from {company.name} with no reason.");
                         }
-                    } else
+                    }
+                    else
                     {
                         await ReplyAsync("You cannot fire someone higher than you.");
                     }
-                } else
+                }
+                else
                 {
                     await ReplyAsync("You do not have the permission to manage employees.");
                 }
-            } else
+            }
+            else
             {
                 await ReplyAsync("You cannot fire people in a company you don't work in.");
+            }
+        }
+        [Command("leave")]
+        [Summary("Leaves a company.")]
+        public async Task leave([Summary("Company ticker")] string ticker, [Summary("Reason, if any")][Remainder] string reason = "")
+        {
+            Company company = await CompanyService.getCompany(ticker);
+            IUser user = Context.User;
+            if (company.employee.ContainsKey(Context.User.Id.ToString()))
+            {
+                company.employee.Remove(user.Id.ToString());
+                await CompanyService.setCompany(company);
+                if (reason != "")
+                {
+                    await ReplyAsync($"You have left {company.name} with reason {reason}");
+                    await Context.Client.GetUser(ulong.Parse(company.employee.FirstOrDefault(x => x.Value.position.ID == "CEO").Value.userID))
+                        .GetOrCreateDMChannelAsync().GetAwaiter().GetResult()
+                        .SendMessageAsync($"{user.Username} has left {company.name} with reason {reason}");
+                }
+                else
+                {
+                    await ReplyAsync($"{user.Username} has been fired from {company.name}");
+                    await Context.Client.GetUser(ulong.Parse(company.employee.FirstOrDefault(x => x.Value.position.ID == "CEO").Value.userID))
+                        .GetOrCreateDMChannelAsync().GetAwaiter().GetResult()
+                        .SendMessageAsync($"{user.Username} has left {company.name} with no reason.");
+                }
+            }
+            else
+            {
+                await ReplyAsync("You cannot fire people in a company you don't work in.");
+            }
+        }
+        [Command("employees")]
+        [Summary("Lists all employees in a corp and their positions.")]
+        public async Task employeeList([Summary("The ticker of the target corporation")] string ticker)
+        {
+            Company company = await CompanyService.getCompany(ticker);
+            if (company.employee.ContainsKey(Context.User.Id.ToString()))
+            {
+                if (r.Contains(company.employee[Context.User.Id.ToString()].position.manages))
+                {
+                    EmbedBuilder embed = new EmbedBuilder()
+                        .WithColor(Color.Orange)
+                        .WithTitle("Employees working at " + company.name)
+                        .WithDescription("Sorted by their level in the company.");
+                    List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
+                    List<Employee> employees = company.employee.Values.ToList();
+                    employees.Sort(company.CompareEmployees);
+                    foreach (Employee x in employees)
+                    {
+                        if(fields.Count < 26)
+                        {
+                            fields.Add(new EmbedFieldBuilder().WithName(Context.Client.GetUser(ulong.Parse(x.userID)).Username).WithValue("Working as " + x.position.name).WithIsInline(true));
+                        }
+                    }
+                    embed.WithFields(fields);
+                    await ReplyAsync(null, false, embed.Build());
+                }
+                else
+                {
+                    await ReplyAsync("You do not have the permission to manage employees.");
+                }
+            }
+            else
+            {
+                await ReplyAsync("You cannot list people in a company you don't work in.");
+            }
+        }
+        [Command("positions")]
+        [Summary("Lists all positions in a corp and their IDs.")]
+        public async Task positionList([Summary("The ticker of the target corporation")] string ticker)
+        {
+            Company company = await CompanyService.getCompany(ticker);
+            if (company.employee.ContainsKey(Context.User.Id.ToString()))
+            {
+                if (w.Contains(company.employee[Context.User.Id.ToString()].position.manages))
+                {
+                    EmbedBuilder embed = new EmbedBuilder()
+                        .WithColor(Color.Orange)
+                        .WithTitle("Positions in " + company.name)
+                        .WithDescription("Sorted by their level in the company.");
+                    List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
+                    List<Position> positions = company.positions.Values.ToList();
+                    positions.Sort(company.ComparePositions);
+                    foreach (Position x in positions)
+                    {
+                        if (fields.Count < 26)
+                        {
+                            fields.Add(new EmbedFieldBuilder().WithName(x.name).WithValue("ID: " + x.ID).WithIsInline(true));
+                        }
+                    }
+                    embed.WithFields(fields);
+                    await ReplyAsync(null, false, embed.Build());
+                }
+                else
+                {
+                    await ReplyAsync("You do not have the permission to manage positions.");
+                }
+            }
+            else
+            {
+                await ReplyAsync("You cannot list positions in a company you don't work in.");
             }
         }
     }

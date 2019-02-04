@@ -21,7 +21,7 @@ namespace VIR.Modules
         }
 
         [Command("balance")]
-        [Summary("Returns you balance")]
+        [Summary("Returns your balance")]
         public async Task BalanceAsync([Summary("Optional: An user whose age you wish to get")]IUser user = null)
         {
             string aget;
