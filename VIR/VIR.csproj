@@ -208,6 +208,7 @@
     <Compile Include="Objects\Company\Position.cs" />
     <Compile Include="Modules\Preconditions\HasMasterOfBotsAttribute.cs" />
     <Compile Include="Modules\Preconditions\IsInDPSGuildAttribute.cs" />
+    <Compile Include="Objects\IndustrySellOffer.cs" />
     <Compile Include="Objects\ResourceMarketListing.cs" />
     <Compile Include="Objects\ResourceTransaction.cs" />
     <Compile Include="Objects\StockMarketObjects.cs" />

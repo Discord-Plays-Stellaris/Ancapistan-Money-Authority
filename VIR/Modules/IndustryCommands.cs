@@ -37,7 +37,8 @@ namespace VIR.Modules
             var response = _industryService.WorkAtIndustryForUtils(industryId, utilSpent, Context.User.Id.ToString());
         }
 
-        public async Task SellIndustryTo(string industryId, string companyToSellToId, double price)
+        [Command("sellindustry")]
+        public async Task SellIndustry(string industryId, double price)
         {
 
         }
