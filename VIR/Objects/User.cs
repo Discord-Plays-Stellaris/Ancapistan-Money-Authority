@@ -14,7 +14,7 @@ namespace VIR.Objects
         public double Money; // Money they have, duh
         public int Age; // Age of the player
         public int PP; // PP hehe
-        public string MainCompany; // Primary company of the user, three letter ticket
+        public string MainCompany; // Primary company of the user, three letter ticker
 
         public User(string id, double money, int age, int pp, string mainCompany)
         {

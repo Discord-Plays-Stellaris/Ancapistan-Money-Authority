@@ -41,12 +41,23 @@ namespace AMA_Client.Objects
         public string id;
         public Dictionary<string, int> ownedShares = new Dictionary<string, int>(); // Format: Ticker, Shares
 
+        public UserShares()
+        {
+
+        }
+
         public UserShares(JObject input)
         {
-            UserShares tempObj = JsonConvert.DeserializeObject<UserShares>(input.ToString());
-
-            id = tempObj.id;
-            ownedShares = tempObj.ownedShares;
+            if(input != null)
+            {
+                UserShares tempObj = JsonConvert.DeserializeObject<UserShares>(input.ToString());
+                id = tempObj.id;
+                ownedShares = tempObj.ownedShares;
+            }
+            if(input == null)
+            {
+                return;
+            }
         }
     }
 

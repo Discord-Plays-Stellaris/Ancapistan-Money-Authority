@@ -201,7 +201,7 @@ namespace VIR.Modules
                         await db.RemoveObjectAsync(offerID, "transactions");
 
                         ITextChannel chnl = (ITextChannel)await Context.Client.GetChannelAsync((UInt64)await db.GetFieldAsync("MarketChannel", "channel", "system"));
-                        await chnl.DeleteMessageAsync(transaction.messageID);
+                        await chnl.DeleteMessageAsync(Convert.ToUInt64(transaction.messageID));
 
                         await ReplyAsync("Transaction complete!");
                         await CommandService.PostMessageTask((string)await db.GetFieldAsync("MarketChannel", "channel", "system"), $"<@{transaction.author}>'s Transaction with ID {transaction.id} has been accepted by <@{Context.User.Id}>!");
@@ -327,8 +327,6 @@ namespace VIR.Modules
 
                 try
                 {
-                    Guid GUID = Guid.NewGuid();
-                    transaction.id = GUID;
                     JObject tmp = db.SerializeObject(transaction);
                     await db.SetJObjectAsync(tmp, "transactions");
                     await ReplyAsync($"Sell offer lodged in <#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");

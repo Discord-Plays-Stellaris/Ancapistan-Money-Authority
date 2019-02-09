@@ -73,9 +73,9 @@ namespace AMA_Client.Services
         /// <param name="fieldName">The field to be retrived</param>
         /// <param name="tableName">The name of the table of the document.</param>
         /// <returns></returns>
-        public static async Task<JToken> GetFieldAsync(string userid, string fieldName, string tableName)
+        public static JToken GetField(string userid, string fieldName, string tableName)
         {
-            JObject rawStr = await r.Db("root").Table(tableName).Get(userid).RunAsync(conn);
+            JObject rawStr = r.Db("root").Table(tableName).Get(userid).Run(conn);
             if (rawStr == null)
                 return null;
 

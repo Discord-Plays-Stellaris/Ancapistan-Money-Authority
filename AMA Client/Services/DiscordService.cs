@@ -11,6 +11,6 @@ namespace AMA_Client.Services
 {
     class DiscordService : ModuleBase
     {
-
+        
     }
 }

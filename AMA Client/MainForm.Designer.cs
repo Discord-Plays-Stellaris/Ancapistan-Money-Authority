@@ -29,32 +29,33 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabUser = new System.Windows.Forms.TabPage();
+            this.buttonLogOut = new System.Windows.Forms.Button();
+            this.buttonReload = new System.Windows.Forms.Button();
+            this.labelShares = new System.Windows.Forms.Label();
+            this.dataGridViewShares = new System.Windows.Forms.DataGridView();
             this.labelCompaniesList = new System.Windows.Forms.Label();
             this.listBoxCompanies = new System.Windows.Forms.ListBox();
             this.labelMoney = new System.Windows.Forms.Label();
-            this.labelBalance = new System.Windows.Forms.Label();
+            this.labelPP = new System.Windows.Forms.Label();
             this.labelUsername = new System.Windows.Forms.Label();
             this.buttonLogIn = new System.Windows.Forms.Button();
-            this.tabStockMarket = new System.Windows.Forms.TabPage();
+            this.tabEconomy = new System.Windows.Forms.TabPage();
             this.tabAbout = new System.Windows.Forms.TabPage();
             this.buttonGitHub = new System.Windows.Forms.Button();
             this.textBoxCredits = new System.Windows.Forms.TextBox();
-            this.dataGridViewShares = new System.Windows.Forms.DataGridView();
-            this.ColumnTicker = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColumnSharesOwned = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.buttonQuit = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabUser.SuspendLayout();
-            this.tabAbout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewShares)).BeginInit();
+            this.tabAbout.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabUser);
-            this.tabControl1.Controls.Add(this.tabStockMarket);
+            this.tabControl1.Controls.Add(this.tabEconomy);
             this.tabControl1.Controls.Add(this.tabAbout);
             this.tabControl1.Location = new System.Drawing.Point(-1, 0);
             this.tabControl1.Name = "tabControl1";
@@ -64,11 +65,15 @@
             // 
             // tabUser
             // 
+            this.tabUser.Controls.Add(this.buttonQuit);
+            this.tabUser.Controls.Add(this.buttonLogOut);
+            this.tabUser.Controls.Add(this.buttonReload);
+            this.tabUser.Controls.Add(this.labelShares);
             this.tabUser.Controls.Add(this.dataGridViewShares);
             this.tabUser.Controls.Add(this.labelCompaniesList);
             this.tabUser.Controls.Add(this.listBoxCompanies);
             this.tabUser.Controls.Add(this.labelMoney);
-            this.tabUser.Controls.Add(this.labelBalance);
+            this.tabUser.Controls.Add(this.labelPP);
             this.tabUser.Controls.Add(this.labelUsername);
             this.tabUser.Controls.Add(this.buttonLogIn);
             this.tabUser.Location = new System.Drawing.Point(4, 25);
@@ -78,6 +83,57 @@
             this.tabUser.TabIndex = 0;
             this.tabUser.Text = "User";
             this.tabUser.UseVisualStyleBackColor = true;
+            // 
+            // buttonLogOut
+            // 
+            this.buttonLogOut.Location = new System.Drawing.Point(710, 50);
+            this.buttonLogOut.Name = "buttonLogOut";
+            this.buttonLogOut.Size = new System.Drawing.Size(75, 34);
+            this.buttonLogOut.TabIndex = 9;
+            this.buttonLogOut.Text = "Log Out";
+            this.buttonLogOut.UseVisualStyleBackColor = true;
+            this.buttonLogOut.Visible = false;
+            this.buttonLogOut.Click += new System.EventHandler(this.buttonLogOut_Click);
+            // 
+            // buttonReload
+            // 
+            this.buttonReload.Location = new System.Drawing.Point(710, 7);
+            this.buttonReload.Name = "buttonReload";
+            this.buttonReload.Size = new System.Drawing.Size(75, 34);
+            this.buttonReload.TabIndex = 8;
+            this.buttonReload.Text = "Reload";
+            this.buttonReload.UseVisualStyleBackColor = true;
+            this.buttonReload.Visible = false;
+            this.buttonReload.Click += new System.EventHandler(this.buttonReload_Click);
+            // 
+            // labelShares
+            // 
+            this.labelShares.AutoSize = true;
+            this.labelShares.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelShares.Location = new System.Drawing.Point(219, 106);
+            this.labelShares.Name = "labelShares";
+            this.labelShares.Size = new System.Drawing.Size(64, 17);
+            this.labelShares.TabIndex = 7;
+            this.labelShares.Text = "Shares:";
+            // 
+            // dataGridViewShares
+            // 
+            this.dataGridViewShares.AllowUserToAddRows = false;
+            this.dataGridViewShares.AllowUserToDeleteRows = false;
+            this.dataGridViewShares.AllowUserToResizeColumns = false;
+            this.dataGridViewShares.AllowUserToResizeRows = false;
+            this.dataGridViewShares.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.dataGridViewShares.BackgroundColor = System.Drawing.Color.White;
+            this.dataGridViewShares.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridViewShares.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.dataGridViewShares.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewShares.Location = new System.Drawing.Point(219, 130);
+            this.dataGridViewShares.Name = "dataGridViewShares";
+            this.dataGridViewShares.RowHeadersVisible = false;
+            this.dataGridViewShares.RowTemplate.Height = 24;
+            this.dataGridViewShares.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.dataGridViewShares.Size = new System.Drawing.Size(240, 276);
+            this.dataGridViewShares.TabIndex = 6;
             // 
             // labelCompaniesList
             // 
@@ -108,14 +164,14 @@
             this.labelMoney.TabIndex = 3;
             this.labelMoney.Text = "Balance: $00.00";
             // 
-            // labelBalance
+            // labelPP
             // 
-            this.labelBalance.AutoSize = true;
-            this.labelBalance.Location = new System.Drawing.Point(10, 33);
-            this.labelBalance.Name = "labelBalance";
-            this.labelBalance.Size = new System.Drawing.Size(141, 17);
-            this.labelBalance.TabIndex = 2;
-            this.labelBalance.Text = "Personal Influence: 0";
+            this.labelPP.AutoSize = true;
+            this.labelPP.Location = new System.Drawing.Point(10, 33);
+            this.labelPP.Name = "labelPP";
+            this.labelPP.Size = new System.Drawing.Size(141, 17);
+            this.labelPP.TabIndex = 2;
+            this.labelPP.Text = "Personal Influence: 0";
             // 
             // labelUsername
             // 
@@ -137,15 +193,15 @@
             this.buttonLogIn.UseVisualStyleBackColor = true;
             this.buttonLogIn.Click += new System.EventHandler(this.buttonLogIn_Click);
             // 
-            // tabStockMarket
+            // tabEconomy
             // 
-            this.tabStockMarket.Location = new System.Drawing.Point(4, 25);
-            this.tabStockMarket.Name = "tabStockMarket";
-            this.tabStockMarket.Padding = new System.Windows.Forms.Padding(3);
-            this.tabStockMarket.Size = new System.Drawing.Size(794, 421);
-            this.tabStockMarket.TabIndex = 1;
-            this.tabStockMarket.Text = "Stock Market";
-            this.tabStockMarket.UseVisualStyleBackColor = true;
+            this.tabEconomy.Location = new System.Drawing.Point(4, 25);
+            this.tabEconomy.Name = "tabEconomy";
+            this.tabEconomy.Padding = new System.Windows.Forms.Padding(3);
+            this.tabEconomy.Size = new System.Drawing.Size(794, 421);
+            this.tabEconomy.TabIndex = 1;
+            this.tabEconomy.Text = "Economy";
+            this.tabEconomy.UseVisualStyleBackColor = true;
             // 
             // tabAbout
             // 
@@ -179,41 +235,15 @@
             this.textBoxCredits.TabIndex = 0;
             this.textBoxCredits.Text = resources.GetString("textBoxCredits.Text");
             // 
-            // dataGridViewShares
+            // buttonQuit
             // 
-            this.dataGridViewShares.AllowUserToAddRows = false;
-            this.dataGridViewShares.AllowUserToDeleteRows = false;
-            this.dataGridViewShares.AllowUserToResizeColumns = false;
-            this.dataGridViewShares.AllowUserToResizeRows = false;
-            this.dataGridViewShares.BackgroundColor = System.Drawing.Color.White;
-            this.dataGridViewShares.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridViewShares.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            this.dataGridViewShares.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewShares.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ColumnTicker,
-            this.ColumnSharesOwned});
-            this.dataGridViewShares.Location = new System.Drawing.Point(219, 130);
-            this.dataGridViewShares.Name = "dataGridViewShares";
-            this.dataGridViewShares.RowHeadersVisible = false;
-            this.dataGridViewShares.RowTemplate.Height = 24;
-            this.dataGridViewShares.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dataGridViewShares.Size = new System.Drawing.Size(240, 276);
-            this.dataGridViewShares.TabIndex = 6;
-            // 
-            // ColumnTicker
-            // 
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ColumnTicker.DefaultCellStyle = dataGridViewCellStyle2;
-            this.ColumnTicker.HeaderText = "Ticker";
-            this.ColumnTicker.Name = "ColumnTicker";
-            this.ColumnTicker.ToolTipText = "The ticker of the company in which you own shares.";
-            // 
-            // ColumnSharesOwned
-            // 
-            this.ColumnSharesOwned.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ColumnSharesOwned.HeaderText = "Shares Owned";
-            this.ColumnSharesOwned.Name = "ColumnSharesOwned";
-            this.ColumnSharesOwned.Width = 130;
+            this.buttonQuit.Location = new System.Drawing.Point(710, 379);
+            this.buttonQuit.Name = "buttonQuit";
+            this.buttonQuit.Size = new System.Drawing.Size(75, 34);
+            this.buttonQuit.TabIndex = 10;
+            this.buttonQuit.Text = "Quit";
+            this.buttonQuit.UseVisualStyleBackColor = true;
+            this.buttonQuit.Click += new System.EventHandler(this.buttonQuit_Click);
             // 
             // MainForm
             // 
@@ -221,15 +251,17 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.tabControl1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "Ancapistan Money Authority";
             this.tabControl1.ResumeLayout(false);
             this.tabUser.ResumeLayout(false);
             this.tabUser.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewShares)).EndInit();
             this.tabAbout.ResumeLayout(false);
             this.tabAbout.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewShares)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -238,18 +270,20 @@
 
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabUser;
-        private System.Windows.Forms.TabPage tabStockMarket;
+        private System.Windows.Forms.TabPage tabEconomy;
         private System.Windows.Forms.TabPage tabAbout;
         private System.Windows.Forms.TextBox textBoxCredits;
         private System.Windows.Forms.Button buttonLogIn;
         private System.Windows.Forms.Button buttonGitHub;
         private System.Windows.Forms.Label labelUsername;
         private System.Windows.Forms.Label labelMoney;
-        private System.Windows.Forms.Label labelBalance;
+        private System.Windows.Forms.Label labelPP;
         private System.Windows.Forms.ListBox listBoxCompanies;
         private System.Windows.Forms.Label labelCompaniesList;
         private System.Windows.Forms.DataGridView dataGridViewShares;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnTicker;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnSharesOwned;
+        private System.Windows.Forms.Label labelShares;
+        private System.Windows.Forms.Button buttonReload;
+        private System.Windows.Forms.Button buttonLogOut;
+        private System.Windows.Forms.Button buttonQuit;
     }
 }

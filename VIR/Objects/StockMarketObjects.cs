@@ -56,7 +56,7 @@ namespace VIR.Objects
         public string type; // buy, sell, private
         public string author;
         public string ticker;
-        public ulong messageID; 
+        public string messageID; 
 
 
         public Transaction(JObject JSONInput)
@@ -67,7 +67,7 @@ namespace VIR.Objects
             type = (string)JSONInput["type"];
             author = (string)JSONInput["author"];
             ticker = (string)JSONInput["ticker"];
-            messageID = (ulong)JSONInput["messageID"];
+            messageID = (string)JSONInput["messageID"];
         }
 
         /// <summary>
@@ -87,7 +87,9 @@ namespace VIR.Objects
             type = _type;
             author = _author;
             ticker = _ticker;
-            messageID = LodgeTransactionTask(db, command).GetAwaiter().GetResult();
+            id = Guid.NewGuid();
+
+            messageID = Convert.ToString(LodgeTransactionTask(db, command).GetAwaiter().GetResult());
 
         }
 
