@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace VIR.Objects
         public int PP; // PP hehe
         public string MainCompany; // Primary company of the user, three letter ticket
         public int Utils; // default max 100
+        public Collection<string> corps;
 
         public User(string id, double money, int age, int pp, string mainCompany, int Utils)
         {
@@ -34,6 +36,10 @@ namespace VIR.Objects
             PP = (int) dbInput["pp"];
             MainCompany = (string) dbInput["maincompany"];
             Utils = (int) dbInput["utils"];
+            foreach (string x in dbInput["corps"].ToArray())
+            {
+                corps.Add(x);
+            }
         }
 
         public JObject SerializeIntoJObject()

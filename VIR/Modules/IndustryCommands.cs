@@ -9,6 +9,7 @@ using Discord.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using VIR.Modules.Preconditions;
+using VIR.Objects;
 using VIR.Objects.Company;
 using VIR.Services;
 
@@ -35,6 +36,7 @@ namespace VIR.Modules
         public async Task WorkAtIndustry(string industryId, int utilSpent)
         {
             var response = _industryService.WorkAtIndustryForUtils(industryId, utilSpent, Context.User.Id.ToString());
+            await ReplyAsync(response);
         }
 
         [Command("sellindustry")]
@@ -141,6 +143,7 @@ namespace VIR.Modules
                 if (companies.Contains(ticker))
                 {
                     industry.CompanyId = ticker;
+                    await _dataBaseService.SetJObjectAsync(industry.SerializeIntoJObject(), "industries");
                     await ReplyAsync($"Successfully set ownership of {industryId} to {ticker}.");
                 }
 
