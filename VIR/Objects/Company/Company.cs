@@ -18,12 +18,12 @@ namespace VIR.Modules.Objects.Company
         public string id;
         public string name;
         public Dictionary<string, Employee> employee; //Format: userid, title
-        //public Dictionary<string, int> assets; //thing, amount
         public Dictionary<string, Position> positions;
         public double Money;
         public int shares;
         public double SharePrice;
         public Dictionary<string, JobOffer> jobOffers;
+        public Dictionary<string, JobRequest> jobRequests;
         public string role;
 
         public Company()
