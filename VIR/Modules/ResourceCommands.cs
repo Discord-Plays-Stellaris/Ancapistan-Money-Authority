@@ -51,7 +51,7 @@ namespace VIR.Modules
                 currentListing = new ResourceMarketListing(x);
 
                 string seller = "";
-                if (currentListing.IdSeller.Length > 17)
+                if (currentListing.IdSeller.Length <=3)
                 {
                     seller = new Company(_dataBaseService.getJObjectAsync(currentListing.IdSeller, "companies").Result).name;
                 }
