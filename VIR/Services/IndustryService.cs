@@ -9,7 +9,7 @@ using VIR.Objects.Company;
 
 namespace VIR.Services
 {
-    class IndustryService
+    public class IndustryService
     {
         private readonly CompanyService _companyService;
         private readonly DataBaseHandlingService _database;

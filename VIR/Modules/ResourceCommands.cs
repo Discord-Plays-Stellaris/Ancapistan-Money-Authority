@@ -14,7 +14,7 @@ using VIR.Services;
 
 namespace VIR.Modules
 {
-    class ResourceCommands : ModuleBase
+    public class ResourceCommands : ModuleBase
     {
         private readonly CompanyService _companyService;
         private readonly DataBaseHandlingService _dataBaseService;

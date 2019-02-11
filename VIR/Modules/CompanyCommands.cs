@@ -20,6 +20,10 @@ using VIR.Properties;
 // THINGS ONCE YOU FIX IT.
 // --Skipper
 
+// IT ALL WAS PROBABLY VISUAL STUDIO BEING SHITE
+// PING ME NEXT TIME
+// --Towergame
+
 namespace VIR.Modules
 {
     /// <summary>
@@ -61,7 +65,6 @@ namespace VIR.Modules
             company.employee = new Dictionary<string, Employee>();
             company.positions = new Dictionary<string, Position>();
             company.jobOffers = new Dictionary<string, JobOffer>();
-            //company.industries = new Dictionary<string, int>();
             Employee employee = new Employee();
             employee.userID = CEO.Id.ToString();
             employee.salary = 0;
@@ -96,13 +99,6 @@ namespace VIR.Modules
         [Summary("Lists all companies.")]
         public async Task GetCompaniesTask()
         {
-            /*string tmp = "";
-            Collection<JObject> ids = await dataBaseService.getJObjects("companies");
-            foreach(JObject x in ids)
-            {
-                tmp += (string)x["id"] + " - " + (string)x["name"] + "\n";
-            }
-            await ReplyAsync($"Current Companies:\n{tmp}");*/
 
             Collection<string> ids = await dataBaseService.getIDs("companies");
             int companyCount = ids.Count;
@@ -438,11 +434,11 @@ namespace VIR.Modules
             request.salary = salary;
             request.user = Context.User.Id.ToString();
             string id = Guid.NewGuid().ToString();
-            //if (company.jobRequests == null)
+            if (company.jobRequests == null)
             {
-            //    company.jobRequests = new Dictionary<string, JobRequest>();
+                company.jobRequests = new Dictionary<string, JobRequest>();
             }
-            //company.jobRequests.Add(id, request);
+            company.jobRequests.Add(id, request);
             IDMChannel chan = await Context.Client.GetUser(ulong.Parse(company.employee.FirstOrDefault(x => x.Value.position.ID == "CEO").Value.userID)).GetOrCreateDMChannelAsync();
             EmbedBuilder embed = new EmbedBuilder().WithTitle("A new job request has come in.").WithDescription($"Job Request Author: {Context.User.Username}#{Context.User.Discriminator}").AddField(new EmbedFieldBuilder().WithName("Minimum required salary:").WithValue(salary)).AddField(new EmbedFieldBuilder().WithName("Minimum required wage:").WithValue(wage)).WithColor(Color.Orange).WithFooter(new EmbedFooterBuilder().WithText($"To accept, type &acceptrequest {ticker} {id} [desired salary] [desired wage] [desired position ID]"));
             await chan.SendMessageAsync(null, false, embed.Build());
@@ -458,7 +454,7 @@ namespace VIR.Modules
             {
                 if (r.Contains(company.employee[Context.User.Id.ToString()].position.manages))
                 {
-                    if (/*salary >= company.jobRequests[id].salary && wage >= company.jobRequests[id].wage*/true)
+                    if (salary >= company.jobRequests[id].salary && wage >= company.jobRequests[id].wage)
                     {
                         if (company.positions.ContainsKey(positionid))
                         {
@@ -469,8 +465,8 @@ namespace VIR.Modules
                                 employee.wage = wage;
                                 employee.position = company.positions[positionid];
                                 employee.wageEarned = 0;
-                                //employee.userID = company.jobRequests[id].user;
-                                //company.employee.Add(company.jobRequests[id].user, employee);
+                                employee.userID = company.jobRequests[id].user;
+                                company.employee.Add(company.jobRequests[id].user, employee);
                                 if ((await dataBaseService.getJObjectAsync(employee.userID, "users"))["maincorp"] == null)
                                 {
                                     await dataBaseService.SetFieldAsync(employee.userID, "maincorp", ticker, "users");
@@ -527,9 +523,9 @@ namespace VIR.Modules
             {
                 if (r.Contains(company.employee[Context.User.Id.ToString()].position.manages))
                 {
-                    //string userID = company.jobRequests[id].user;
-                    //company.jobRequests.Remove(id);
-                    //await (await Context.Client.GetUser(ulong.Parse(userID)).GetOrCreateDMChannelAsync()).SendMessageAsync("Your request to work at " + company.name + " has been denied.");
+                    string userID = company.jobRequests[id].user;
+                    company.jobRequests.Remove(id);
+                    await (await Context.Client.GetUser(ulong.Parse(userID)).GetOrCreateDMChannelAsync()).SendMessageAsync("Your request to work at " + company.name + " has been denied.");
                     await CompanyService.setCompany(company);
                     await ReplyAsync("Job Request denied.");
                 }
