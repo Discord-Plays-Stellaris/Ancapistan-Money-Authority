@@ -15,7 +15,7 @@ namespace VIR.Modules.Preconditions
             #if DEBUG
             guild = ulong.Parse(Resources.devguild);
             #endif
-            if(context.Guild.Id.Equals(guild))
+            if(context.Guild.Id.Equals(guild) || context.Guild.Id.Equals(498512980284276746))
             {
                 return PreconditionResult.FromSuccess();
             } else

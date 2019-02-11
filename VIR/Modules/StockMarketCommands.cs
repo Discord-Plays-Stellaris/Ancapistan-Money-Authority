@@ -253,8 +253,6 @@ namespace VIR.Modules
 
                 try
                 {
-                    Guid GUID = Guid.NewGuid();
-                    transaction.id = GUID;
                     JObject tmp = db.SerializeObject(transaction);
                     await db.SetJObjectAsync(tmp, "transactions");
                     await ReplyAsync($"Buy offer lodged in <#{await db.GetFieldAsync("MarketChannel", "channel", "system")}>");
