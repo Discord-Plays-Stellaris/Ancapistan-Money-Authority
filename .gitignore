@@ -259,8 +259,12 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# Resources
 /VIR/Properties/Resources.resx
 /VIR/Properties/Resources.Designer.cs
+/AMA Web/Properties/Resources.resx
+/AMA Client/Properties/Resources.resx
 
 # I don't know what this is but it's annoying me
 *.sqlite
