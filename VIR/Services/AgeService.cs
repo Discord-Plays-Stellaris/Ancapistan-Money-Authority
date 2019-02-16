@@ -72,7 +72,7 @@ namespace VIR.Services
             await __database.RemoveUserAsync(user.Id.ToString());
             await user.SendMessageAsync("You are dead");
             SocketGuildUser userSocket = (SocketGuildUser) user;
-            await user.RemoveRolesAsync(userSocket.Roles.Where(x => (x.Position < 91 && x.Position > 34)));
+            //await user.RemoveRolesAsync(userSocket.Roles.Where(x => (x.Position < 91 && x.Position > 34)));
             await user.ModifyAsync(delegate(GuildUserProperties prop) {
                 prop.Nickname = user.Username;
             });
