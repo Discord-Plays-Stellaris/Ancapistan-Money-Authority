@@ -67,7 +67,7 @@ namespace VIR.Modules
                     pp = int.Parse(PPt);
                 }
 
-                EmbedFieldBuilder ppField = new EmbedFieldBuilder().WithIsInline(false).WithName("PP:").WithValue(pp.ToString());
+                EmbedFieldBuilder ppField = new EmbedFieldBuilder().WithIsInline(false).WithName("PI:").WithValue(pp.ToString());
                 EmbedFieldBuilder moneyField = new EmbedFieldBuilder().WithIsInline(false).WithName("Money:").WithValue($"${money.ToString()}");
                 Embed embedd = new EmbedBuilder().WithImageUrl(Context.User.GetAvatarUrl()).WithFooter($"User ID: {Context.User.Id.ToString()}").WithTitle($"Inventory of {Context.User.Username}").WithDescription($"Age: {age.ToString()}").AddField(ppField).AddField(moneyField).WithColor(Color.Green).Build();
 
@@ -102,7 +102,7 @@ namespace VIR.Modules
         public async Task SetAsync([Summary("Field to get")] string field, [Summary("User")] IUser user, [Summary("Value to set to")] int value)
         {
             await DataBaseHandlingService.SetFieldAsync(user.Id.ToString(), field, value, "users");
-            await ReplyAsync($"{field} value set to {value}");
+            await ReplyAsync($"{field} value set to {value}. If you updated PI, please remember to update the sheet.");
         }
 
         [Command("add")]
@@ -122,7 +122,7 @@ namespace VIR.Modules
                 val = int.Parse(x);
             }
             await DataBaseHandlingService.SetFieldAsync(user.Id.ToString(), field, value + val, "users");
-            await ReplyAsync($"{field} value modified by {value}");
+            await ReplyAsync($"{field} value modified by {value}. If you updated PI, please remember to update the sheet.");
         }
 
         [Command("advance")]
