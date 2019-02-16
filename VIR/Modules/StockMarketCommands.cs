@@ -130,6 +130,11 @@ namespace VIR.Modules
 
             if (IDs.Contains(offerID) == true)
             {
+                if(offerID.Substring(0,4) == "ind-")
+                {
+                    await ReplyAsync("You need to provide a ticker of the company which will get the industry.");
+                    return;
+                }
                 Transaction transaction = new Transaction(await db.getJObjectAsync(offerID, "transactions"));
 
                 if (transaction.author != Context.User.Id.ToString())

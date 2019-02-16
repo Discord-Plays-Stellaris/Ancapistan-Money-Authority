@@ -108,6 +108,63 @@ namespace VIR.Objects
         }
     }
 
+    /// <summary>
+    /// Literally the Transaction class, just refit to work with industries.
+    /// </summary>
+    public class IndustryTransaction
+    {
+        public string id;
+        public double price;
+        public string type; // buy, sell, private
+        public string author;
+        public string industryID;
+        public string messageID;
+
+        public IndustryTransaction(JObject JSONInput)
+        {
+            id = (string)JSONInput["id"];
+            price = (double)JSONInput["price"];
+            type = (string)JSONInput["type"];
+            author = (string)JSONInput["author"];
+            industryID = (string)JSONInput["industryID"];
+            messageID = (string)JSONInput["messageID"];
+        }
+
+        /// <summary>
+        /// The constructor for a new transaction.
+        /// </summary>
+        /// <param name="_price">The price per share</param>
+        /// <param name="_shares">The total amount of shares</param>
+        /// <param name="_type">Buy, sell, or private</param>
+        /// <param name="_author">The user who initiated the transaction</param>
+        /// <param name="_ticker">The ticker of the company who's shares are being traded</param>
+        /// <param name="db">A DataBaseHandlingService object</param>
+        /// <param name="command">A CommandHandlingService object</param>77
+        public IndustryTransaction(double _price, string _type, string _author, string _industryID, DataBaseHandlingService db, CommandHandlingService command)
+        {
+            price = _price;
+            type = _type;
+            author = _author;
+            industryID = _industryID;
+            id = "ind-" + Guid.NewGuid().ToString();
+
+            messageID = Convert.ToString(LodgeTransactionTask(db, command).GetAwaiter().GetResult());
+
+        }
+        private async Task<ulong> LodgeTransactionTask(DataBaseHandlingService db, CommandHandlingService CommandService)
+        {
+            EmbedFieldBuilder typeField = new EmbedFieldBuilder().WithIsInline(true).WithName("Type:").WithValue($"Looking to {type} industry");
+            EmbedFieldBuilder companyField = new EmbedFieldBuilder().WithIsInline(true).WithName("ID:").WithValue(industryID);
+            EmbedFieldBuilder amountField = new EmbedFieldBuilder().WithIsInline(true).WithName("Type:").WithValue(db.GetFieldAsync(industryID, "type", "industry"));
+            EmbedFieldBuilder priceField = new EmbedFieldBuilder().WithIsInline(true).WithName("Price:").WithValue("$" + price);
+
+            EmbedBuilder emb = new EmbedBuilder().WithTitle("Stock Market Offer").WithDescription($"Use the command `&accept {id.ToString()}` to accept this offer.").WithFooter($"Transaction ID: {id.ToString()}").AddField(typeField).AddField(companyField).AddField(amountField).AddField(priceField).WithColor(Color.Green);
+
+            Discord.Rest.RestUserMessage message = await CommandService.PostEmbedTask((string)await db.GetFieldAsync("MarketChannel", "channel", "system"), emb.Build());
+            return message.Id;
+        }
+    }
+
     public class UserShares
     {
         public string id;

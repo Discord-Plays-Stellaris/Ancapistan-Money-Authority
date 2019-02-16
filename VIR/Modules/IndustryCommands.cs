@@ -8,6 +8,7 @@ using Discord;
 using Discord.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using VIR.Modules.Objects.Company;
 using VIR.Modules.Preconditions;
 using VIR.Objects;
 using VIR.Objects.Company;
@@ -39,10 +40,231 @@ namespace VIR.Modules
             await ReplyAsync(response);
         }
 
-        [Command("sellindustry")]
-        public async Task SellIndustry(string industryId, double price)
+        //Fancy shit
+        //if this breaks, blame tower
+        [Command("buyoffer")]
+        [Alias("buyindustry")]
+        [Summary("Set up an offer to buy")]
+        public async Task BuyOfferAsync([Summary("Company ticker")]string ticker, [Summary("Industry ID")]string industryID, [Summary("Price")]double price)
         {
+            string AuthorMoneyt = (string)await _dataBaseService.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
+            double AuthorMoney;
 
+            if (price < 0)
+            {
+                await ReplyAsync("You cant sell for a negative amount of money!");
+                return;
+            }
+
+            if (AuthorMoneyt == null)
+            {
+                AuthorMoney = 50000;
+                await _dataBaseService.SetFieldAsync(Context.User.Id.ToString(), "money", AuthorMoney, "users");
+            }
+            else
+            {
+                AuthorMoney = double.Parse(AuthorMoneyt);
+            }
+
+            Industry industry = new Industry(await _dataBaseService.getJObjectAsync(industryID, "industries"));
+            Company company = await _companyService.getCompany(ticker);
+            if (!company.employee.Keys.Contains(Context.User.Id.ToString()))
+            {
+                await ReplyAsync("You cannot buy industries for corps you are not an employee of.");
+                return;
+            }
+            if (!new List<int> { 1, 3, 5, 7 }.Contains(company.employee[Context.User.Id.ToString()].position.manages))
+            {
+                await ReplyAsync($"You do not have the permission to buy industry in {company.name}");
+            }
+            IndustryTransaction transaction = new IndustryTransaction(price, "buy", Context.User.Id.ToString(), industryID, _dataBaseService, _commandService);
+
+            try
+            {
+                JObject tmp = _dataBaseService.SerializeObject(transaction);
+                await _dataBaseService.SetJObjectAsync(tmp, "transactions");
+                await ReplyAsync($"Sell offer lodged in <#{await _dataBaseService.GetFieldAsync("MarketChannel", "channel", "system")}>");
+            }
+            catch (Exception e)
+            {
+                await Log.Logger(Log.Logs.ERROR, e.Message);
+                await ReplyAsync("Something went wrong: " + e.Message);
+            }
+        }
+
+        [Command("selloffer")]
+        [Alias("sellindustry")]
+        [Summary("Put up industry for sale.")]
+        public async Task SellOfferAsync([Summary("The id of the industry you wish to sell")] string industryID, [Summary("The price for which you wish to sell")]int price)
+        {
+            string AuthorMoneyt = (string)await _dataBaseService.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
+            double AuthorMoney;
+
+            if (price < 0)
+            {
+                await ReplyAsync("You cant sell for a negative amount of money!");
+                return;
+            }
+
+            if (AuthorMoneyt == null)
+            {
+                AuthorMoney = 50000;
+                await _dataBaseService.SetFieldAsync(Context.User.Id.ToString(), "money", AuthorMoney, "users");
+            }
+            else
+            {
+                AuthorMoney = double.Parse(AuthorMoneyt);
+            }
+
+            Industry industry = new Industry(await _dataBaseService.getJObjectAsync(industryID, "industries"));
+            Company company = await _companyService.getCompany(industry.CompanyId);
+            if(!company.employee.Keys.Contains(Context.User.Id.ToString()))
+            {
+                await ReplyAsync("You cannot sell industries you do not own.");
+                return;
+            }
+            if(!new List<int> { 1, 3, 5, 7 }.Contains(company.employee[Context.User.Id.ToString()].position.manages))
+            {
+                await ReplyAsync($"You do not have the permission to sell industry in {company.name}");
+            }
+            IndustryTransaction transaction = new IndustryTransaction(price, "sell", Context.User.Id.ToString(), industryID, _dataBaseService, _commandService);
+
+            try
+            {
+            JObject tmp = _dataBaseService.SerializeObject(transaction);
+            await _dataBaseService.SetJObjectAsync(tmp, "transactions");
+            await ReplyAsync($"Sell offer lodged in <#{await _dataBaseService.GetFieldAsync("MarketChannel", "channel", "system")}>");
+            }
+            catch (Exception e)
+            {
+            await Log.Logger(Log.Logs.ERROR, e.Message);
+            await ReplyAsync("Something went wrong: " + e.Message);
+            }
+        }
+        [Command("putonmarket")]
+        [Alias("putindustry")]
+        [Summary("Puts an unclaimed industry up for sale")]
+        [HasMasterOfBots]
+        public async Task PutOnMarket([Summary("Industry ID")] string industryID, [Summary("Price")]double price)
+        {
+            Industry industry = new Industry(await _dataBaseService.getJObjectAsync(industryID, "industries"));
+            if(industry.CompanyId.Length > 0)
+            {
+                await ReplyAsync("You cannot sell an industry owned by someone.");
+                return;
+            }
+            IndustryTransaction transaction = new IndustryTransaction(price, "sell", "518874317656686593" //AMA user id, just a dummy id to put the money in
+                , industryID, _dataBaseService, _commandService);
+
+            try
+            {
+                JObject tmp = _dataBaseService.SerializeObject(transaction);
+                await _dataBaseService.SetJObjectAsync(tmp, "transactions");
+                await ReplyAsync($"Sell offer lodged in <#{await _dataBaseService.GetFieldAsync("MarketChannel", "channel", "system")}>");
+            }
+            catch (Exception e)
+            {
+                await Log.Logger(Log.Logs.ERROR, e.Message);
+                await ReplyAsync("Something went wrong: " + e.Message);
+            }
+
+        }
+        [Command("accept")]
+        [Alias("acceptoffer")]
+        [Summary("Accepts an offer")]
+        public async Task AcceptOfferAsync([Summary("Company Ticker")]string ticker, [Summary("The ID of the offer.")]string offerID)
+        {
+            Collection<string> IDs = await _dataBaseService.getIDs("transactions");
+            string userMoneyt;
+            string authorMoneyt;
+            double userMoney;
+            double authorMoney;
+
+            if (IDs.Contains(offerID) == true)
+            {
+                IndustryTransaction transaction = new IndustryTransaction(await _dataBaseService.getJObjectAsync(offerID, "transactions"));
+                JObject obj = await _dataBaseService.getJObjectAsync(transaction.industryID, "industries");
+                Industry ind = new Industry(obj);
+                Company transCom = null;
+                if (transaction.type == "buy")
+                {
+                    transCom = await _companyService.getCompany(ind.CompanyId);
+                }
+                Company exeCom = await _companyService.getCompany(ticker);
+                if (transaction.author != Context.User.Id.ToString())
+                {
+                    // Gets money values of the command user and the transaction author
+                    userMoneyt = (string)await _dataBaseService.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
+                    if (userMoneyt == null)
+                    {
+                        userMoney = 50000;
+                    }
+                    else
+                    {
+                        userMoney = double.Parse(userMoneyt);
+                    }
+
+                    authorMoneyt = (string)await _dataBaseService.GetFieldAsync(transaction.author, "money", "users");
+                    if (authorMoneyt == null)
+                    {
+                        authorMoney = 50000;
+                    }
+                    else
+                    {
+                        authorMoney = double.Parse(authorMoneyt);
+                    }
+
+                    // Transfers the money
+                    if (transaction.type == "buy")
+                    {
+                        userMoney += transaction.price;
+                        authorMoney -= transaction.price;
+                    }
+                    else
+                    {
+                        userMoney -= transaction.price;
+                        authorMoney += transaction.price;
+                    }
+
+                    if (transaction.type == "sell")
+                    {
+                        ind.CompanyId = ticker;
+                        await _dataBaseService.SetJObjectAsync(ind.SerializeIntoJObject(), "industries");
+                    }
+                    else
+                    {
+                        ind.CompanyId = transCom.id;
+                        await _dataBaseService.SetJObjectAsync(ind.SerializeIntoJObject(), "industries");
+                    }
+
+                    if (userMoney < 0)
+                    {
+                        await ReplyAsync("You cannot complete this transaction as it would leave you with a negative amount on money.");
+                    }
+                    else
+                    {
+
+                        await _dataBaseService.SetFieldAsync(Context.User.Id.ToString(), "money", userMoney, "users");
+                        await _dataBaseService.SetFieldAsync(transaction.author, "money", authorMoney, "users");
+                        await _dataBaseService.RemoveObjectAsync(offerID, "transactions");
+
+                        ITextChannel chnl = (ITextChannel)await Context.Client.GetChannelAsync((UInt64)await _dataBaseService.GetFieldAsync("MarketChannel", "channel", "system"));
+                        await chnl.DeleteMessageAsync(Convert.ToUInt64(transaction.messageID));
+
+                        await ReplyAsync("Transaction complete!");
+                        await _commandService.PostMessageTask((string)await _dataBaseService.GetFieldAsync("MarketChannel", "channel", "system"), $"<@{transaction.author}>'s Transaction with ID {transaction.id} has been accepted by <@{Context.User.Id}>!");
+                        //await transaction.authorObj.SendMessageAsync($"Your transaction with the id {transaction.id} has been completed by {Context.User.Username.ToString()}");
+                    }
+                }
+                else
+                {
+                    await ReplyAsync("You cannot accept your own transaction!");
+                }
+            }
+            else
+            {
+                await ReplyAsync("That is not a valid transaction ID");
+            }
         }
 
         //done
@@ -83,7 +305,7 @@ namespace VIR.Modules
             {
                 Industry industry = new Industry(await _dataBaseService.getJObjectAsync(id, "industries"));
 
-                EmbedFieldBuilder embedField = new EmbedFieldBuilder().WithName(industry.Id).WithValue($"Resource Produced: {industry.Type}. Yearly output: {industry.MonthlyOutput}. Belongs to {industry.CompanyId} on planet {industry.Planet}.");
+                EmbedFieldBuilder embedField = new EmbedFieldBuilder().WithName(industry.id).WithValue($"Resource Produced: {industry.Type}. Yearly output: {industry.MonthlyOutput}. Belongs to {industry.CompanyId} on planet {industry.Planet}.");
                 embed.AddField(embedField);
             }
 
@@ -121,8 +343,8 @@ namespace VIR.Modules
 
             foreach (var x in ownedIndustries)
             {
-                var embedField = new EmbedFieldBuilder().WithName(x.Id)
-                    .WithValue($"ID: {x.Id}. Resource Produced: {x.Type}. Yearly output: {x.MonthlyOutput}. On the planet {x.Planet}.");
+                var embedField = new EmbedFieldBuilder().WithName(x.id)
+                    .WithValue($"ID: {x.id}. Resource Produced: {x.Type}. Yearly output: {x.MonthlyOutput}. On the planet {x.Planet}.");
                 embed.AddField(embedField);
             }
 
