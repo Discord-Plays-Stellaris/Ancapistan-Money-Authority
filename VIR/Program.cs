@@ -12,7 +12,7 @@ namespace VIR
 {
     class Root
     {
-
+        static ServiceProvider servicess;
         static void Main(string[] args) => new Root().MainAsync().GetAwaiter().GetResult(); //Start Main Task, this logs the bot in.
 
         public async Task MainAsync()
@@ -26,7 +26,10 @@ namespace VIR
             {
                 var __client = services.GetRequiredService<DiscordSocketClient>(); //Create a new client in the Client Variable
 
+                servicess = services;
+
                 __client.Log += LogAsync;
+                __client.Connected += onConnected;
                 string botToken;
                 if (isDebugMode)
                 {
@@ -43,6 +46,11 @@ namespace VIR
 
                 await Task.Delay(-1); //Prevent stopping the program until it is closed
             }
+        }
+        
+        private async Task onConnected()
+        {
+            await servicess.GetRequiredService<StockMarketService>().InitAuctionSchedulers();
         }
 
         //Logging task

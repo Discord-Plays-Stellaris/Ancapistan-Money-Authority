@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using VIR.Properties;
 using Newtonsoft.Json;
 using System.Windows.Forms;
+using VIR.Objects;
 
 namespace VIR.Services
 {

@@ -140,6 +140,8 @@ namespace VIR.Modules
                 {
                     if (company.positions.ContainsKey(positionID))
                     {
+                        if (company.positions[positionID].level > company.employee[Context.User.Id.ToString()].position.level)
+                            await ReplyAsync("You cannot add a position higher than you.");
                         company.employee[user.Id.ToString()].position = company.positions[positionID];
                         await ReplyAsync($"Successfully changed {user.Mention} to position of {company.positions[positionID].name}");
                     }
@@ -148,6 +150,9 @@ namespace VIR.Modules
                         await ReplyAsync("The position id you specified is invalid.");
                     }
                 }
+            } else
+            {
+                await ReplyAsync("You are not allowed to manage positions.");
             }
         }
 

@@ -111,12 +111,27 @@ namespace VIR.Services
             return await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channel))).SendMessageAsync("", false, embed);
         }
 
+        public async Task EditEmbedTask(string channel, string messageID, Embed embed)
+        {
+            await ((Discord.Rest.RestUserMessage)await ((ISocketMessageChannel)__client.GetChannel(ulong.Parse(channel))).GetMessageAsync(ulong.Parse(messageID))).ModifyAsync(x => x.Embed = embed);
+        }
+
         ///<summary>
         ///Gets all available commands.
         ///</summary>
         public async Task<IEnumerable<CommandInfo>> getCommands()
         {
             return __commands.Commands;
+        }
+
+        public async Task deleteMessageTask(string channelid, string messageid)
+        {
+            await ((ISocketMessageChannel)__client.GetChannel(Convert.ToUInt64(channelid))).DeleteMessageAsync(Convert.ToUInt64(messageid));
+        }
+
+        public async Task sendDMTask(string userid, string message)
+        {
+            await __client.GetUser(ulong.Parse(userid)).SendMessageAsync(message);
         }
     }
 }

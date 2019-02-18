@@ -9,6 +9,10 @@ using Discord.Net;
 using VIR.Services;
 using VIR.Objects;
 using VIR.Modules.Objects.Company;
+using VIR.Objects.Company;
+using Discord.WebSocket;
+using Newtonsoft.Json.Linq;
+using VIR.Properties;
 
 namespace VIR.Services
 {
@@ -18,10 +22,26 @@ namespace VIR.Services
     public class StockMarketService
     {
         private readonly DataBaseHandlingService db;
+        private readonly CommandHandlingService comm;
+        private readonly DiscordSocketClient __client;
 
-        public StockMarketService(DataBaseHandlingService _db)
+        public StockMarketService(DataBaseHandlingService _db, CommandHandlingService com)
         {
             db = _db;
+            comm = com;
+        }
+
+        public async Task InitAuctionSchedulers()
+        {
+            Collection<JObject> transaction = await db.getJObjects("transactions");
+            foreach (JObject x in transaction)
+            {
+                if ((string)x["type"] == "auction")
+                {
+                    IndustryAuction auction = new IndustryAuction(x);
+                    await auction.schedule(db, comm, this);
+                }
+            }
         }
 
         public async Task SetShares(string userID, string ticker, int amount)

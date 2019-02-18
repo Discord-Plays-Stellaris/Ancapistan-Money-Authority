@@ -61,6 +61,18 @@ namespace VIR.Services
                 if(ageNew >= expectancy) {
                     await KillAsync(x);
                 }
+                string money = (string)await __database.GetFieldAsync(x.Id.ToString(), "money", "users");
+                double moneyd;
+                if (money == null)
+                {
+                    moneyd = 50000;
+                    await __database.SetFieldAsync<double>(x.Id.ToString(), "money", moneyd, "users");
+                }
+                else
+                {
+                    moneyd = (1300 * amount) + double.Parse(money);
+                    await __database.SetFieldAsync<double>(x.Id.ToString(), "money", moneyd, "users");
+                }
             }
         }
         public async Task KillAsync(IGuildUser user)

@@ -145,7 +145,7 @@ namespace VIR.Modules
         [Alias("putindustry")]
         [Summary("Puts an unclaimed industry up for sale")]
         [HasMasterOfBots]
-        public async Task PutOnMarket([Summary("Industry ID")] string industryID, [Summary("Price")]double price)
+        public async Task PutOnMarket([Summary("Industry ID")] string industryID, [Summary("Price")]double price, [Summary("Hours for the auction to last")]int hours, [Summary("Minutes for the auction to last")]int minutes)
         {
             Industry industry = new Industry(await _dataBaseService.getJObjectAsync(industryID, "industries"));
             if(industry.CompanyId.Length > 0)
@@ -153,14 +153,12 @@ namespace VIR.Modules
                 await ReplyAsync("You cannot sell an industry owned by someone.");
                 return;
             }
-            IndustryTransaction transaction = new IndustryTransaction(price, "sell", "518874317656686593" //AMA user id, just a dummy id to put the money in
-                , industryID, _dataBaseService, _commandService);
+            IndustryAuction transaction = new IndustryAuction(price, "sell", industryID, _dataBaseService, _commandService, _marketService, hours, minutes);
 
             try
             {
-                JObject tmp = _dataBaseService.SerializeObject(transaction);
-                await _dataBaseService.SetJObjectAsync(tmp, "transactions");
-                await ReplyAsync($"Sell offer lodged in <#{await _dataBaseService.GetFieldAsync("MarketChannel", "channel", "system")}>");
+                await _dataBaseService.SetJObjectAsync(transaction.SerializeIntoJObject(), "transactions");
+                await ReplyAsync($"Auction lodged in <#{await _dataBaseService.GetFieldAsync("MarketChannel", "channel", "system")}>");
             }
             catch (Exception e)
             {
@@ -185,12 +183,30 @@ namespace VIR.Modules
                 IndustryTransaction transaction = new IndustryTransaction(await _dataBaseService.getJObjectAsync(offerID, "transactions"));
                 JObject obj = await _dataBaseService.getJObjectAsync(transaction.industryID, "industries");
                 Industry ind = new Industry(obj);
+                Company exeCom = await _companyService.getCompany(ticker);
                 Company transCom = null;
                 if (transaction.type == "buy")
                 {
                     transCom = await _companyService.getCompany(ind.CompanyId);
+                    if (!exeCom.employee.Keys.Contains(Context.User.Id.ToString()))
+                    {
+                        await ReplyAsync("You cannot sell industries for corps you are not an employee of.");
+                        return;
+                    }
+                    if (!new List<int> { 1, 3, 5, 7 }.Contains(exeCom.employee[Context.User.Id.ToString()].position.manages))
+                    {
+                        await ReplyAsync($"You do not have the permission to sell industry in {exeCom.name}");
+                    }
                 }
-                Company exeCom = await _companyService.getCompany(ticker);
+                if (!exeCom.employee.Keys.Contains(Context.User.Id.ToString()))
+                {
+                    await ReplyAsync("You cannot buy industries for corps you are not an employee of.");
+                    return;
+                }
+                if (!new List<int> { 1, 3, 5, 7 }.Contains(exeCom.employee[Context.User.Id.ToString()].position.manages))
+                {
+                    await ReplyAsync($"You do not have the permission to buy industry in {exeCom.name}");
+                }
                 if (transaction.author != Context.User.Id.ToString())
                 {
                     // Gets money values of the command user and the transaction author
@@ -253,6 +269,90 @@ namespace VIR.Modules
 
                         await ReplyAsync("Transaction complete!");
                         await _commandService.PostMessageTask((string)await _dataBaseService.GetFieldAsync("MarketChannel", "channel", "system"), $"<@{transaction.author}>'s Transaction with ID {transaction.id} has been accepted by <@{Context.User.Id}>!");
+                        //await transaction.authorObj.SendMessageAsync($"Your transaction with the id {transaction.id} has been completed by {Context.User.Username.ToString()}");
+                    }
+                }
+                else
+                {
+                    await ReplyAsync("You cannot accept your own transaction!");
+                }
+            }
+            else
+            {
+                await ReplyAsync("That is not a valid transaction ID");
+            }
+        }
+
+        [Command("bid")]
+        public async Task BidOfferAsync([Summary("Company Ticker")]string ticker, [Summary("The ID of the offer.")]string offerID, [Summary("bid")]double bid)
+        {
+            Collection<string> IDs = await _dataBaseService.getIDs("transactions");
+            string userMoneyt;
+            string authorMoneyt;
+            double userMoney;
+            double authorMoney;
+
+            if (IDs.Contains(offerID) == true)
+            {
+                IndustryAuction transaction = new IndustryAuction(await _dataBaseService.getJObjectAsync(offerID, "transactions"));
+                JObject obj = await _dataBaseService.getJObjectAsync(transaction.industryID, "industries");
+                Industry ind = new Industry(obj);
+                Company exeCom = await _companyService.getCompany(ticker);
+                if (!exeCom.employee.Keys.Contains(Context.User.Id.ToString()))
+                {
+                    await ReplyAsync("You cannot buy industries for corps you are not an employee of.");
+                    return;
+                }
+                if (!new List<int> { 1, 3, 5, 7 }.Contains(exeCom.employee[Context.User.Id.ToString()].position.manages))
+                {
+                    await ReplyAsync($"You do not have the permission to buy industry in {exeCom.name}");
+                }
+                if (transaction.price > bid)
+                {
+                    await ReplyAsync("Your bid is too low!");
+                    return;
+                }
+                if (transaction.currentUser != Context.User.Id.ToString())
+                {
+                    // Gets money values of the command user and the transaction author
+                    userMoneyt = (string)await _dataBaseService.GetFieldAsync(Context.User.Id.ToString(), "money", "users");
+                    if (userMoneyt == null)
+                    {
+                        userMoney = 50000;
+                    }
+                    else
+                    {
+                        userMoney = double.Parse(userMoneyt);
+                    }
+
+                    authorMoneyt = (string)await _dataBaseService.GetFieldAsync(transaction.currentUser, "money", "users");
+                    if (authorMoneyt == null)
+                    {
+                        authorMoney = 50000;
+                    }
+                    else
+                    {
+                        authorMoney = double.Parse(authorMoneyt);
+                    }
+
+                    authorMoney += transaction.price;
+                    userMoney -= bid;
+
+                    if (userMoney < 0)
+                    {
+                        await ReplyAsync("You cannot complete this transaction as it would leave you with a negative amount on money.");
+                    }
+                    else
+                    {
+
+                        await _dataBaseService.SetFieldAsync(Context.User.Id.ToString(), "money", userMoney, "users");
+                        await _dataBaseService.SetFieldAsync(transaction.currentUser, "money", authorMoney, "users");
+                        string oldWinner = transaction.currentWinner;
+                        await transaction.Bid(bid, ticker, Context.User.Id.ToString(), _dataBaseService, _commandService);
+                        await _dataBaseService.SetJObjectAsync(transaction.SerializeIntoJObject(), "transactions");
+
+                        await ReplyAsync("Transaction complete!");
+                        await _commandService.PostMessageTask((string)await _dataBaseService.GetFieldAsync("MarketChannel", "channel", "system"), $"<@{oldWinner}>'s bid in the Auction with ID {transaction.id} has been outbid by <@{Context.User.Id}>!");
                         //await transaction.authorObj.SendMessageAsync($"Your transaction with the id {transaction.id} has been completed by {Context.User.Username.ToString()}");
                     }
                 }
