@@ -78,5 +78,15 @@ namespace VIR.Modules
         {
             await comhan.PostMessageTask(channel.Id.ToString(), contents);
         }
+
+        [HasMasterOfBots]
+        [Command("timeTest")]
+        public async Task timeTest(string hours, string minutes)
+        {
+            int hoursi = int.Parse(hours);
+            int minutesi = int.Parse(minutes);
+            DateTime time = DateTime.UtcNow.AddHours(hoursi).AddMinutes(minutesi);
+            await ReplyAsync(time.ToFileTimeUtc().ToString());
+        }
     }
 }

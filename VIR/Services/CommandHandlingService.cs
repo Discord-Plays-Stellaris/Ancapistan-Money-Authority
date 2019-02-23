@@ -7,6 +7,8 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Quartz;
+using Quartz.Impl;
 
 namespace VIR.Services
 {
@@ -16,6 +18,8 @@ namespace VIR.Services
         private readonly CommandService __commands;
         private readonly DiscordSocketClient __client;
         private readonly IServiceProvider __services;
+        public IScheduler scheduler;
+        
 
         public CommandHandlingService(IServiceProvider services)
         {
@@ -26,12 +30,15 @@ namespace VIR.Services
             //__commands.CommandExecuted += CommandExecutedAsync;
             __commands.Log += Logging;
             __client.MessageReceived += MessageReceivedAsync;
+            
 
         }
 
         public async Task InitializeAsync()
         {
             await __commands.AddModulesAsync(Assembly.GetEntryAssembly(), __services);
+            scheduler = await StdSchedulerFactory.GetDefaultScheduler();
+            await scheduler.Start();
         }
 
         public async Task MessageReceivedAsync(SocketMessage msg)

@@ -185,6 +185,8 @@ namespace VIR.Modules
                 Industry ind = new Industry(obj);
                 Company exeCom = await _companyService.getCompany(ticker);
                 Company transCom = null;
+                if (transaction.type == "auction")
+                    await ReplyAsync("You must bid for auctions.");
                 if (transaction.type == "buy")
                 {
                     transCom = await _companyService.getCompany(ind.CompanyId);
@@ -347,7 +349,7 @@ namespace VIR.Modules
 
                         await _dataBaseService.SetFieldAsync(Context.User.Id.ToString(), "money", userMoney, "users");
                         await _dataBaseService.SetFieldAsync(transaction.currentUser, "money", authorMoney, "users");
-                        string oldWinner = transaction.currentWinner;
+                        string oldWinner = transaction.currentUser;
                         await transaction.Bid(bid, ticker, Context.User.Id.ToString(), _dataBaseService, _commandService);
                         await _dataBaseService.SetJObjectAsync(transaction.SerializeIntoJObject(), "transactions");
 

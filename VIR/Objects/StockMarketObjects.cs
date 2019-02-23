@@ -190,7 +190,7 @@ namespace VIR.Objects
             industryID = (string)JSONInput["industryID"];
             messageID = (string)JSONInput["messageID"];
             currentWinner = (string)JSONInput["currentWinner"];
-            plannedEnd = DateTime.FromFileTime(long.Parse((string)JSONInput["plannedEnd"]));
+            plannedEnd = DateTime.FromFileTimeUtc(long.Parse((string)JSONInput["plannedEnd"]));
             currentUser = (string)JSONInput["currentUser"];
             type = (string)JSONInput["type"];
         }
@@ -230,19 +230,17 @@ namespace VIR.Objects
             EmbedBuilder emb = new EmbedBuilder().WithTitle("Stock Market Offer").WithDescription($"Use the command `&bid [ticker] {id.ToString()} [price]` to accept this offer.").WithFooter($"Transaction ID: {id.ToString()}").AddField(typeField).AddField(companyField).AddField(amountField).AddField(priceField).WithColor(Color.Green);
 
             Discord.Rest.RestUserMessage message = await CommandService.PostEmbedTask((string)await db.GetFieldAsync("MarketChannel", "channel", "system"), emb.Build());
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             DateTime scheduled = now.AddHours(hours).AddMinutes(mins);
             plannedEnd = scheduled;
-            IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
-            await scheduler.Start();
             JobDataMap map = new JobDataMap();
             map.Add("market", marketService);
             map.Add("auction", this);
             map.Add("command", CommandService);
             map.Add("db", db);
             IJobDetail job = JobBuilder.Create<Job>().SetJobData(map).Build();
-            ITrigger trigger = TriggerBuilder.Create().WithSimpleSchedule(x => x.WithRepeatCount(0).WithInterval(TimeSpan.FromTicks(plannedEnd.Ticks - DateTime.Now.Ticks))).Build();
-            await scheduler.ScheduleJob(job, trigger);
+            ITrigger trigger = TriggerBuilder.Create().WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromMilliseconds(1)).WithRepeatCount(1)).StartAt(plannedEnd).Build();
+            await CommandService.scheduler.ScheduleJob(job, trigger);
 
             return message.Id;
         }
@@ -274,13 +272,13 @@ namespace VIR.Objects
             jObject["currentWinner"] = currentWinner;
             jObject["currentUser"] = currentUser;
             jObject["type"] = type;
-            jObject["plannedEnd"] = plannedEnd.Ticks.ToString();
+            jObject["plannedEnd"] = plannedEnd.ToFileTimeUtc().ToString();
             return jObject;
         }
 
         public async Task schedule(DataBaseHandlingService db, CommandHandlingService CommandService, StockMarketService marketService)
         {
-            if ((plannedEnd.Ticks - DateTime.Now.Ticks) <= 0)
+            if (plannedEnd.Ticks <= DateTime.Now.Ticks)
             {
                 Industry ind = new Industry(await db.getJObjectAsync(this.industryID, "industries"));
                 ind.CompanyId = this.currentWinner;
@@ -293,16 +291,14 @@ namespace VIR.Objects
                 await CommandService.PostMessageTask(markchan, $"Auction with ID {this.id} has been won by <@{(string)await db.GetFieldAsync(this.currentWinner, "name", "companies")}>!");
                 return;
             }
-            IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
-            await scheduler.Start();
             JobDataMap map = new JobDataMap();
             map.Add("market", marketService);
             map.Add("auction", this);
             map.Add("command", CommandService);
             map.Add("db", db);
             IJobDetail job = JobBuilder.Create<Job>().SetJobData(map).Build();
-            ITrigger trigger = TriggerBuilder.Create().WithSimpleSchedule(x => x.WithRepeatCount(0).WithInterval(TimeSpan.FromTicks(plannedEnd.Ticks - DateTime.Now.Ticks))).Build();
-            await scheduler.ScheduleJob(job, trigger);
+            ITrigger trigger = TriggerBuilder.Create().WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromMilliseconds(1)).WithRepeatCount(1)).StartAt(plannedEnd).Build();
+            await CommandService.scheduler.ScheduleJob(job, trigger);
         }
 
         class Job : IJob
@@ -322,6 +318,7 @@ namespace VIR.Objects
                 StockMarketService market = (StockMarketService)context.JobDetail.JobDataMap.Get("market");
                 CommandHandlingService comm = (CommandHandlingService)context.JobDetail.JobDataMap.Get("command");
                 DataBaseHandlingService db = (DataBaseHandlingService)context.JobDetail.JobDataMap.Get("db");
+                auction = new IndustryAuction(await db.getJObjectAsync(auction.id, "transactions"));
                 Industry ind = new Industry(await db.getJObjectAsync(auction.industryID, "industries"));
                 ind.CompanyId = auction.currentWinner;
                 await db.SetJObjectAsync(ind.SerializeIntoJObject(), "industries");
@@ -330,7 +327,7 @@ namespace VIR.Objects
 
                 await comm.deleteMessageTask(markchan, auction.messageID);
 
-                await comm.PostMessageTask(markchan, $"Auction with ID {auction.id} has been accepted by <@{(string)await db.GetFieldAsync(auction.currentWinner, "name", "companies")}>!");
+                await comm.PostMessageTask(markchan, $"Auction with ID {auction.id} has been accepted by {(string)await db.GetFieldAsync(auction.currentWinner, "name", "companies")}!");
             }
         }
     }
