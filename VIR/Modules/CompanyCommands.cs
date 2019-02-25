@@ -109,8 +109,10 @@ namespace VIR.Modules
                 Company temp = new Company(await dataBaseService.getJObjectAsync(ID, "companies"));
 
                 EmbedFieldBuilder tempEmb = new EmbedFieldBuilder().WithIsInline(true).WithName($"{temp.name} ({temp.id})").WithValue($"Share Price: ${Math.Round(temp.SharePrice, 2)}. Total Value: ${Math.Round(temp.SharePrice * temp.shares, 2)}. Amount of Shares: {await MarketService.CorpShares(temp.id)}");
-
-                companyEmbedList.Add(tempEmb);
+                if (companyEmbedList.Count < 25)
+                {
+                    companyEmbedList.Add(tempEmb);
+                }
             }
 
             EmbedBuilder embed = new EmbedBuilder().WithColor(Color.Gold).WithTitle("Companies").WithDescription("This is a list of all companies").WithFooter($"Total amount of companies: {companyCount}");
